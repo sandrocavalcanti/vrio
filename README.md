@@ -1,7 +1,7 @@
 Aplicativo vrio
 ====
 
-Este projeto consistem em um aplicativo mobile Sencha Touch integrado com uma API em Node JS + Express + MongoDB, incluindo acesso administrativo atravẽs de uma interface WEB com Angular JS.
+Este projeto consiste em um aplicativo mobile Sencha Touch integrado com uma API em Slim PHP + MySQL, incluindo acesso administrativo atravẽs de uma interface WEB com Angular JS.
 
 Modelo de Dados
 ====
