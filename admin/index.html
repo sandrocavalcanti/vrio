@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html ng-app ng-controller="AdminCtrl">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Administração :: Vrio</title>
+  
+
+
+  <!-- ========= -->
+  <!--    CSS    -->
+  <!-- ========= -->
+ <link href="css/bootstrap.min.css" rel="stylesheet" media="screen"> 
+  <style type="text/css">
+   /*CSS*/
+   /* custom inclusion of right, left and below tabs */
+
+.tabs-left > .nav-tabs {
+  border-bottom: 0;
+}
+
+.tab-content > .tab-pane,
+.pill-content > .pill-pane {
+  display: none;
+}
+
+.tab-content > .active,
+.pill-content > .active {
+  display: block;
+}
+
+
+.tabs-left > .nav-tabs > li {
+  float: none;
+}
+
+.tabs-left > .nav-tabs > li > a{
+  min-width: 74px;
+  margin-right: 0;
+  margin-bottom: 3px;
+}
+
+.tabs-left > .nav-tabs {
+  float: left;
+  margin-right: 19px;
+  border-right: 1px solid #ddd;
+}
+
+.tabs-left > .nav-tabs > li > a {
+  margin-right: -1px;
+  -webkit-border-radius: 4px 0 0 4px;
+     -moz-border-radius: 4px 0 0 4px;
+          border-radius: 4px 0 0 4px;
+}
+
+.tabs-left > .nav-tabs > li > a:hover,
+.tabs-left > .nav-tabs > li > a:focus {
+  border-color: #eeeeee #dddddd #eeeeee #eeeeee;
+}
+
+.tabs-left > .nav-tabs .active > a,
+.tabs-left > .nav-tabs .active > a:hover,
+.tabs-left > .nav-tabs .active > a:focus {
+  border-color: #ddd transparent #ddd #ddd;
+  *border-right-color: #ffffff;
+}
+
+.tab-content label{
+  font-weight:normal;
+  width:100%;
+  display:block;
+}
+
+.list-group{
+  margin-left: 92px;
+  margin-top: 10px;
+  min-height: 600px;
+  max-height: 700px;
+  overflow: auto;
+}
+
+.mt40{margin-top: 40px}
+
+.tabbable{
+  border-right: 1px solid #ddd;
+  min-height: 400px;
+}
+
+#editar_foto{
+  position: absolute;
+  z-index: 100;
+  padding: 2px;
+  text-align: center;
+  top: 75px;
+  left: 40px;
+  font-size: 11px;
+}
+
+#carregando {
+width: 155px;
+height: 44px;
+padding: 11px 10px;
+background-color: #C00;
+color: #FFF;
+position: fixed;
+top: 0;
+right: 0;
+font-weight: bold;
+z-index: 9000 ;
+}
+
+.nav>li>a {
+position: relative;
+display: block;
+padding: 5px 15px;
+}
+
+.bar {
+    height: 18px;
+    background: green;
+}
+  </style>  
+</head>
+<body>
+  <!-- ========= -->
+  <!-- Your HTML -->
+  <!-- ========= -->
+<div class="container"> 
+
+
+  <div class="row">
+    
+    <h1>Administração :: Vrio</h1>
+
+  </div>
+  
+  <hr>
+
+   <div class="alert fade in">
+    <div id="msg_alert"></div>
+  </div>
+
+  <ul id="menu" class="nav nav-pills hide">
+    <li class="active"><a href="#" ng-click="viewCustomer()">Clientes</a></li>
+    <li><a href="#" ng-click="viewBanheiro()">Banheiro</a></li>
+    <li><a href="#" ng-click="viewUser()">Usuários</a></li>
+    <li><a href="#" ng-click="logout()">Sair</a></li>
+  </ul>
+
+  <div id="login" class="row mt40 hide tela">
+
+      <fieldset>
+        <legend>Login</legend>
+        <label>E-mail</label>
+        <input type="text" ng-model="user.email">
+        <label>Senha</label>
+        <input type="password" ng-model="user.senha">
+        <button type="button" class="btn" ng-click="login()">Entrar</button>
+      </fieldset>
+
+  </div>
+
+  <!-- CUSTOMER -->
+  <div id="customer" class="row mt40 hide tela">
+     
+             <div class="tabbable tabs-left col-sm-7">
+
+                <div class="tab-content">
+
+                    <!-- input buscar -->
+                        <div class="">
+                                <div class="input-group">
+
+                                  <input type="text" class="form-control" ng-model="buscar.nome">
+
+                                  <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button">
+                                      
+                                      <span class="glyphicon glyphicon-search"></span>
+
+                                    </button>
+                                  </span>
+                                </div>
+                        </div>
+                      <!-- fim input buscar -->
+                  
+                    <table class="table">
+                      <th>Data de cadastro</th>
+                      <th>Nome</th>
+                      <tbody>
+                        <tr ng-repeat="cust in customers | filter:buscar" ng-click="visualizar($index,cust)" ng-class="{'active': $index == ativo}">
+                          <td>{{cust.data_cadastro}}</td>
+                          <td>{{cust.nome}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                </div>
+
+           
+            </div>
+
+            <div class="tab-content col-sm-5 tab-conteudo">
+              <h4 id="nome">
+                {{customer_view.nome}} {{customer_view.sobrenome}}
+              </h4>
+             <hr>
+              <label><strong>E-mail:</strong> <label id="email">{{customer_view.email}}</label></label>
+              <label><strong>Ativo:</strong> <label id="ativo">{{customer_view.ativo == 1 && 'SIM' || 'NÃO'}}</label></label>
+
+              <a href="#" data-toggle="modal" data-target="#modalCadastro"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar" ng-click="editarRevista(revista_view)"><span class="glyphicon glyphicon-edit"></span></a>
+
+              <a id="deletar_contato" class="tip" data-toggle="tooltip" title="Deletar" style="margin-bottom:10px"  role="button" ng-click="deletarRevista(revista_view.id_revista)"><span class="glyphicon glyphicon-trash"></span></a>
+
+            </div>
+
+  </div> 
+
+  <!-- BANHEIRO -->
+  <div id="banheiro" class="row mt40 hide tela">
+     
+             <div class="tabbable tabs-left col-sm-7">
+
+                <div class="tab-content">
+
+                    <!-- input buscar -->
+                        <div class="">
+                                <div class="input-group">
+
+                                  <input type="text" class="form-control" ng-model="buscar.nome">
+
+                                  <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button">
+                                      
+                                      <span class="glyphicon glyphicon-search"></span>
+
+                                    </button>
+                                  </span>
+                                </div>
+                        </div>
+                      <!-- fim input buscar -->
+                  
+                    <table class="table">
+                      <th>Data de cadastro</th>
+                      <th>Descrição</th>
+                      <tbody>
+                        <tr ng-repeat="banh in banheiros | filter:buscar" ng-click="visualizar($index,banh)" ng-class="{'active': $index == ativo}">
+                          <td>{{banh.data_cadastro}}</td>
+                          <td>{{banh.descricao}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                </div>
+
+           
+            </div>
+
+            <div class="tab-content col-sm-5 tab-conteudo">
+              <h4 id="nome">
+                {{banheiro_view.descricao}}
+              </h4>
+             <hr>
+              <label><strong>Endereço:</strong> <label id="endereco">{{banheiro_view.logradouro}}, {{banheiro_view.numero}}, {{banheiro_view.bairro}}, {{banheiro_view.cep}}, {{banheiro_view.cidade}}/{{banheiro_view.uf}}
+              </label></label>
+              <label><strong>Ativo:</strong> <label id="ativo">{{banheiro_view.ativo == 1 && 'SIM' || 'NÃO'}}</label></label>
+
+              <a href="#" data-toggle="modal" data-target="#modalCadastro"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar" ng-click="editarRevista(revista_view)"><span class="glyphicon glyphicon-edit"></span></a>
+
+              <a id="deletar_contato" class="tip" data-toggle="tooltip" title="Deletar" style="margin-bottom:10px"  role="button" ng-click="deletarRevista(revista_view.id_revista)"><span class="glyphicon glyphicon-trash"></span></a>
+
+            </div>
+
+  </div> 
+  
+  <!-- USER -->
+  <div id="user" class="row mt40 hide tela">
+     
+             <div class="tabbable tabs-left col-sm-7">
+
+                <div class="tab-content">
+                        <a href="#" data-toggle="modal" data-target="#modalCadastro" style="margin-bottom:10px" class="btn btn-success" role="button"><span class="glyphicon glyphicon-plus"></span></a>
+
+                    <!-- input buscar -->
+                        <div class="">
+                                <div class="input-group">
+
+                                  <input type="text" class="form-control" ng-model="buscarrevista.descricao">
+
+                                  <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button">
+                                      
+                                      <span class="glyphicon glyphicon-search"></span>
+
+                                    </button>
+                                  </span>
+                                </div>
+                        </div>
+                      <!-- fim input buscar -->
+                  
+                    <table class="table">
+                      <th>Data de cadastro</th>
+                      <th>Nome</th>
+                      <tbody>
+                        <tr ng-repeat="use in users | filter:buscarusesta" ng-click="visualizarRevista($index,use)" ng-class="{'active': $index == ativo}">
+                          <td>{{use.data_cadastro}}</td>
+                          <td>{{use.nome}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                </div>
+
+           
+            </div>
+
+            <div class="tab-content col-sm-5 tab-conteudo">
+              <h4 id="nome">
+                {{user_view.nome}}
+              </h4>
+              <hr>
+              <label><strong>E-mail:</strong><label>{{user_view.email}}</label></label
+              <label><strong>Data Cadastro:</strong> <label>{{user_view.data_cadastro}}</label></label>
+
+               <a href="#" data-toggle="modal" data-target="#modalCadastro"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar" ng-click="editarRevista(revista_view)"><span class="glyphicon glyphicon-edit"></span></a>
+
+              <a id="deletar_contato" class="tip" data-toggle="tooltip" title="Deletar" style="margin-bottom:10px"  role="button" ng-click="deletarRevista(revista_view.id_revista)"><span class="glyphicon glyphicon-trash"></span></a>
+
+            </div>
+
+   </div> 
+
+</div>
+
+
+<!-- Modal Cadastro Revista -->
+<div class="modal fade" id="modalCadastro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Cadastro</h4>
+      </div>
+      <div class="modal-body">
+
+        <form name="formCadastro">
+          <input type="hidden" value="0" ng-model="revista_view.id_revista">
+          <input type="hidden" value="0" id="imagem_capa" ng-model="revista_view.imagem_capa">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Descrição"  ng-model="revista_view.descricao">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Nº da edição"  ng-model="revista_view.edicao">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control"  placeholder="Link"  ng-model="revista_view.link">
+          </div>
+          <div class="form-group">
+            <label >Imagem da Capa:</label>
+            <input type="file" id="fileupload" name="files[]" class="form-control"/>
+
+            <!-- The global progress bar -->
+            <div id="progress" class="progress">
+              <div class="progress-bar progress-bar-success"></div>
+            </div>
+            <!-- The container for the uploaded files -->
+            <div id="files" class="files"></div>
+
+          </div>
+          <div class="form-group">
+            <label>Ativo:</label>
+            <select class="form-control" ng-model="revista_view.ativo">
+              <option value="1">SIM</option>
+              <option value="0">NÃO</option>
+            </select>
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" ng-click="salvarRevista()">Salvar</button>
+      </div>
+    </div> <!-- /.modal-content -->
+ </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+   
+<!-- Loading Ajax -->
+<div id="carregando" style="display: none">
+   Aguarde...
+</div>
+ 
+
+<!-- ========= -->
+<!-- Libraries -->
+<!-- ========= -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+<script src="js/bootstrap.js"></script>
+<script src="js/funcoes.js"></script>
+
+<!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+<script src="js/vendor/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+<!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+<script src="js/vendor/jQuery-File-Upload/js/jquery.iframe-transport.js"></script>
+<!-- The basic File Upload plugin -->
+<script src="js/vendor/jQuery-File-Upload/js/jquery.fileupload.js"></script>
+
+<script>
+$(function () {
+    // Change this to the location of your server-side upload handler:
+    var url = 'server/';
+    $('#fileupload').fileupload({
+        url: url,
+        dataType: 'json',
+        maxFileSize: 3000000,
+        done: function (e, data) {
+            $.each(data.result.files, function (index, file) {
+              $('#files').html('<img style="width:200px !important; border: 5px solid #ed5c1f;" src="server/files/thumbnail/'+file.name+'">');
+                //$('<img width="30" src="server/files/thumbnail/'+file.name+'>').appendTo('#files');
+                $("#imagem_capa").val(file.name);
+            });
+        },
+        fail: function (e, data) {
+            $.each(data.messages, function (index, error) {
+                $('<p style="color: red;">Erro de envio: ' + error + '<i class="elusive-remove" style="padding-left:10px;"/></p>')
+                .appendTo('#files');
+            });
+        },
+        progressall: function (e, data) {
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $('#progress .progress-bar').css(
+                'width',
+                progress + '%'
+            );
+        }
+    }).prop('disabled', !$.support.fileInput)
+      .parent().addClass($.support.fileInput ? undefined : 'disabled');
+});
+</script>
+
+</body>
+</html>

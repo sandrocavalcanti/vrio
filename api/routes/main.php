@@ -2,15 +2,7 @@
 /* MAIN */
 $app->post("/login", 'login');
 $app->get("/logout", 'logout');
-
-$authenticate = function ($app) {
-    return function () use ($app) {
-        if (!isset($_SESSION['vrio']['auth'])) {
-            echo '{"error":{"auth":false}}';
-            exit;
-        }
-    };
-};
+$app->get("/checkauth", $authenticate($app));
 
 function logout()
 {

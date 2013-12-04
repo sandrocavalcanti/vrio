@@ -10,6 +10,15 @@ $app = new \Slim\Slim();
 
 $app->add(new Slim\Middleware\SessionCookie(array('secret' => 'appvrio')));
 
+$authenticate = function ($app) {
+    return function () use ($app) {
+        if (!isset($_SESSION['vrio']['auth'])) {
+            echo '{"auth":false}';
+            exit;
+        }
+    };
+};
+
 // Load all our routes
 require './routes/main.php';
 require './routes/customer.php';
