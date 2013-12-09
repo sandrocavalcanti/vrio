@@ -189,10 +189,14 @@ padding: 5px 15px;
                     <table class="table">
                       <th>Data de cadastro</th>
                       <th>Nome</th>
+                      <th>Email</th>
+                      <th>Celular</th>
                       <tbody>
                         <tr ng-repeat="cust in customers | filter:buscar" ng-click="visualizarCustomer($index,cust)" ng-class="{'active': $index == ativo_customer}">
                           <td>{{cust.data_cadastro}}</td>
                           <td>{{cust.nome}}</td>
+                          <td>{{cust.email}}</td>
+                          <td>{{cust.celular}}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -208,6 +212,8 @@ padding: 5px 15px;
               </h4>
              <hr>
               <label><strong>E-mail:</strong> <label id="email">{{customer_view.email}}</label></label>
+              <label><strong>Celular:</strong> <label id="celular">{{customer_view.celular}}</label></label>
+              <label><strong>Sexo:</strong> <label id="sexo">{{customer_view.sexo}}</label></label>
               <label><strong>Ativo:</strong> <label id="ativo">{{customer_view.ativo == 1 && 'SIM' || 'NÃO'}}</label></label>
 
               <a href="#" data-toggle="modal" data-target="#modalCadastroCustomer"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar"><span class="glyphicon glyphicon-edit"></span></a>
@@ -238,6 +244,16 @@ padding: 5px 15px;
           </div>
           <div class="form-group">
             <input type="text" class="form-control" placeholder="E-mail"  ng-model="customer_view.email">
+          </div>
+          <div class="form-group">
+            <label>Sexo:</label>
+            <select class="form-control" ng-model="customer_view.sexo">
+              <option value="F">Feminino</option>
+              <option value="M">Masculino</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Celular"  ng-model="customer_view.celular">
           </div>
           <div class="form-group">
             <label>Ativo:</label>

@@ -11,8 +11,8 @@ function addCustomer()
 {
     $request = \Slim\Slim::getInstance()->request();
     $customer = json_decode($request->getBody());
-    $sql = "INSERT INTO tb_customer (nome, sobrenome, email, senha) 
-            VALUES (:nome, :sobrenome, :email, :senha)";
+    $sql = "INSERT INTO tb_customer (nome, sobrenome, email, sexo, celular, senha) 
+            VALUES (:nome, :sobrenome, :email, :sexo, :celular, :senha)";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);
@@ -20,6 +20,8 @@ function addCustomer()
         $stmt->bindParam("sobrenome", $customer->sobrenome);
         $stmt->bindParam("email", $customer->email);
         $stmt->bindParam("senha", $customer->senha);
+        $stmt->bindParam("sexo", $customer->sexo);
+        $stmt->bindParam("celular", $customer->celular);
         
         $stmt->execute();
         $customer->id = $db->lastInsertId();
@@ -86,7 +88,9 @@ function updateCustomer($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $customer = json_decode($body);
-    $sql = "UPDATE tb_customer SET nome=:nome, sobrenome=:sobrenome, email=:email, ativo=:ativo WHERE id=:id";
+    $sql = "UPDATE tb_customer 
+            SET nome=:nome, sobrenome=:sobrenome, email=:email, sexo=:sexo, celular=:celular, ativo=:ativo 
+            WHERE id=:id";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);
@@ -94,6 +98,8 @@ function updateCustomer($id) {
         $stmt->bindParam("sobrenome", $customer->sobrenome);
         $stmt->bindParam("email", $customer->email);
         $stmt->bindParam("ativo", $customer->ativo);
+        $stmt->bindParam("sexo", $customer->sexo);
+        $stmt->bindParam("celular", $customer->celular);
         
         $stmt->bindParam("id", $id);
         $stmt->execute();
