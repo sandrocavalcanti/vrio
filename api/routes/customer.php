@@ -86,13 +86,14 @@ function updateCustomer($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $customer = json_decode($body);
-    $sql = "UPDATE tb_customer SET nome=:nome, sobrenome=:sobrenome, email=:email WHERE id=:id";
+    $sql = "UPDATE tb_customer SET nome=:nome, sobrenome=:sobrenome, email=:email, ativo=:ativo WHERE id=:id";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);
         $stmt->bindParam("nome", $customer->nome);
         $stmt->bindParam("sobrenome", $customer->sobrenome);
         $stmt->bindParam("email", $customer->email);
+        $stmt->bindParam("ativo", $customer->ativo);
         
         $stmt->bindParam("id", $id);
         $stmt->execute();

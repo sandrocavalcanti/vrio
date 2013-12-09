@@ -11,8 +11,8 @@ function addBanheiro()
 {
     $request = \Slim\Slim::getInstance()->request();
     $banheiro = json_decode($request->getBody());
-    $sql = "INSERT INTO tb_banheiro (descricao, logradouro, numero, bairro, cep, cidade, uf) 
-            VALUES (:descricao, :logradouro, :numero, :bairro, :cep, :cidade, :uf)";
+    $sql = "INSERT INTO tb_banheiro (descricao, logradouro, numero, bairro, cep, cidade, uf, data_cadastro) 
+            VALUES (:descricao, :logradouro, :numero, :bairro, :cep, :cidade, :uf, NOW())";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);

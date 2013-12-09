@@ -143,9 +143,9 @@ padding: 5px 15px;
   </div>
 
   <ul id="menu" class="nav nav-pills hide">
-    <li class="active"><a href="#" ng-click="viewCustomer()">Clientes</a></li>
-    <li><a href="#" ng-click="viewBanheiro()">Banheiro</a></li>
-    <li><a href="#" ng-click="viewUser()">Usuários</a></li>
+    <li ng-class="{'active': 1 == menu_ativo}"><a href="#" ng-click="viewCustomer()">Clientes</a></li>
+    <li ng-class="{'active': 2 == menu_ativo}"><a href="#" ng-click="viewBanheiro()">Banheiros</a></li>
+    <li ng-class="{'active': 3 == menu_ativo}"><a href="#" ng-click="viewUser()">Usuários</a></li>
     <li><a href="#" ng-click="logout()">Sair</a></li>
   </ul>
 
@@ -190,7 +190,7 @@ padding: 5px 15px;
                       <th>Data de cadastro</th>
                       <th>Nome</th>
                       <tbody>
-                        <tr ng-repeat="cust in customers | filter:buscar" ng-click="visualizar($index,cust)" ng-class="{'active': $index == ativo}">
+                        <tr ng-repeat="cust in customers | filter:buscar" ng-click="visualizarCustomer($index,cust)" ng-class="{'active': $index == ativo_customer}">
                           <td>{{cust.data_cadastro}}</td>
                           <td>{{cust.nome}}</td>
                         </tr>
@@ -210,70 +210,161 @@ padding: 5px 15px;
               <label><strong>E-mail:</strong> <label id="email">{{customer_view.email}}</label></label>
               <label><strong>Ativo:</strong> <label id="ativo">{{customer_view.ativo == 1 && 'SIM' || 'NÃO'}}</label></label>
 
-              <a href="#" data-toggle="modal" data-target="#modalCadastro"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar" ng-click="editarRevista(revista_view)"><span class="glyphicon glyphicon-edit"></span></a>
+              <a href="#" data-toggle="modal" data-target="#modalCadastroCustomer"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar"><span class="glyphicon glyphicon-edit"></span></a>
 
-              <a id="deletar_contato" class="tip" data-toggle="tooltip" title="Deletar" style="margin-bottom:10px"  role="button" ng-click="deletarRevista(revista_view.id_revista)"><span class="glyphicon glyphicon-trash"></span></a>
-
-            </div>
-
-  </div> 
-
-  <!-- BANHEIRO -->
-  <div id="banheiro" class="row mt40 hide tela">
-     
-             <div class="tabbable tabs-left col-sm-7">
-
-                <div class="tab-content">
-
-                    <!-- input buscar -->
-                        <div class="">
-                                <div class="input-group">
-
-                                  <input type="text" class="form-control" ng-model="buscar.nome">
-
-                                  <span class="input-group-btn">
-                                    <button class="btn btn-default" type="button">
-                                      
-                                      <span class="glyphicon glyphicon-search"></span>
-
-                                    </button>
-                                  </span>
-                                </div>
-                        </div>
-                      <!-- fim input buscar -->
-                  
-                    <table class="table">
-                      <th>Data de cadastro</th>
-                      <th>Descrição</th>
-                      <tbody>
-                        <tr ng-repeat="banh in banheiros | filter:buscar" ng-click="visualizar($index,banh)" ng-class="{'active': $index == ativo}">
-                          <td>{{banh.data_cadastro}}</td>
-                          <td>{{banh.descricao}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-
-                </div>
-
-           
-            </div>
-
-            <div class="tab-content col-sm-5 tab-conteudo">
-              <h4 id="nome">
-                {{banheiro_view.descricao}}
-              </h4>
-             <hr>
-              <label><strong>Endereço:</strong> <label id="endereco">{{banheiro_view.logradouro}}, {{banheiro_view.numero}}, {{banheiro_view.bairro}}, {{banheiro_view.cep}}, {{banheiro_view.cidade}}/{{banheiro_view.uf}}
-              </label></label>
-              <label><strong>Ativo:</strong> <label id="ativo">{{banheiro_view.ativo == 1 && 'SIM' || 'NÃO'}}</label></label>
-
-              <a href="#" data-toggle="modal" data-target="#modalCadastro"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar" ng-click="editarRevista(revista_view)"><span class="glyphicon glyphicon-edit"></span></a>
-
-              <a id="deletar_contato" class="tip" data-toggle="tooltip" title="Deletar" style="margin-bottom:10px"  role="button" ng-click="deletarRevista(revista_view.id_revista)"><span class="glyphicon glyphicon-trash"></span></a>
+              <a id="deletar_contato" class="tip" data-toggle="tooltip" title="Deletar" style="margin-bottom:10px"  role="button" ng-click="deletarCustomer(customer_view.id)"><span class="glyphicon glyphicon-trash"></span></a>
 
             </div>
 
   </div> 
+
+<!-- Modal Cadastro Customer -->
+<div class="modal fade" id="modalCadastroCustomer" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Cadastro</h4>
+      </div>
+      <div class="modal-body">
+
+        <form name="formCadastro">
+          <input type="hidden" value="0" ng-model="customer_view.id">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Nome"  ng-model="customer_view.nome">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Sobrenome"  ng-model="customer_view.sobrenome">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="E-mail"  ng-model="customer_view.email">
+          </div>
+          <div class="form-group">
+            <label>Ativo:</label>
+            <select class="form-control" ng-model="customer_view.ativo">
+              <option value="1">SIM</option>
+              <option value="0">NÃO</option>
+            </select>
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" ng-click="salvarCustomer()">Salvar</button>
+      </div>
+    </div> <!-- /.modal-content -->
+ </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- BANHEIRO -->
+<div id="banheiro" class="row mt40 hide tela">
+   
+           <div class="tabbable tabs-left col-sm-7">
+
+              <div class="tab-content">
+                <a href="#" data-toggle="modal" data-target="#modalCadastroBanheiro" style="margin-bottom:10px" class="btn btn-success" role="button"><span class="glyphicon glyphicon-plus"></span></a>
+
+                  <!-- input buscar -->
+                      <div class="">
+                              <div class="input-group">
+
+                                <input type="text" class="form-control" ng-model="buscar.nome">
+
+                                <span class="input-group-btn">
+                                  <button class="btn btn-default" type="button">
+                                    
+                                    <span class="glyphicon glyphicon-search"></span>
+
+                                  </button>
+                                </span>
+                              </div>
+                      </div>
+                    <!-- fim input buscar -->
+                
+                  <table class="table">
+                    <th>Data de cadastro</th>
+                    <th>Descrição</th>
+                    <tbody>
+                      <tr ng-repeat="banh in banheiros | filter:buscar" ng-click="visualizarBanheiro($index,banh)" ng-class="{'active': $index == ativo_banheiro}">
+                        <td>{{banh.data_cadastro}}</td>
+                        <td>{{banh.descricao}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+              </div>
+
+         
+          </div>
+
+          <div class="tab-content col-sm-5 tab-conteudo">
+            <h4 id="nome">
+              {{banheiro_view.descricao}}
+            </h4>
+           <hr>
+            <label><strong>Endereço:</strong> <label id="endereco">{{banheiro_view.logradouro}}, {{banheiro_view.numero}}, {{banheiro_view.bairro}}, {{banheiro_view.cep}}, {{banheiro_view.cidade}}/{{banheiro_view.uf}}
+            </label></label>
+            <label><strong>Ativo:</strong> <label id="ativo">{{banheiro_view.ativo == 1 && 'SIM' || 'NÃO'}}</label></label>
+
+            <a href="#" data-toggle="modal" data-target="#modalCadastroBanheiro"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar"><span class="glyphicon glyphicon-edit"></span></a>
+
+            <a id="deletar_contato" class="tip" data-toggle="tooltip" title="Deletar" style="margin-bottom:10px"  role="button" ng-click="deletarBanheiro(banheiro_view.id)"><span class="glyphicon glyphicon-trash"></span></a>
+
+          </div>
+
+</div> 
+
+<!-- Modal Cadastro Banheiro -->
+<div class="modal fade" id="modalCadastroBanheiro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Cadastro</h4>
+      </div>
+      <div class="modal-body">
+
+        <form name="formCadastro">
+          <input type="hidden" value="0" ng-model="banheiro_view.id">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Descrição"  ng-model="banheiro_view.descricao">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Logradouro"  ng-model="banheiro_view.logradouro">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Número"  ng-model="banheiro_view.numero">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Bairro"  ng-model="banheiro_view.bairro">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="CEP"  ng-model="banheiro_view.cep">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Cidade"  ng-model="banheiro_view.cidade">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="UF"  ng-model="banheiro_view.uf">
+          </div>
+          <div class="form-group">
+            <label>Ativo:</label>
+            <select class="form-control" ng-model="banheiro_view.ativo">
+              <option value="1">SIM</option>
+              <option value="0">NÃO</option>
+            </select>
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" ng-click="salvarBanheiro()">Salvar</button>
+      </div>
+    </div> <!-- /.modal-content -->
+ </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
   
   <!-- USER -->
   <div id="user" class="row mt40 hide tela">
@@ -281,13 +372,13 @@ padding: 5px 15px;
              <div class="tabbable tabs-left col-sm-7">
 
                 <div class="tab-content">
-                        <a href="#" data-toggle="modal" data-target="#modalCadastro" style="margin-bottom:10px" class="btn btn-success" role="button"><span class="glyphicon glyphicon-plus"></span></a>
+                        <a href="#" data-toggle="modal" data-target="#modalCadastroUser" style="margin-bottom:10px" class="btn btn-success" role="button"><span class="glyphicon glyphicon-plus"></span></a>
 
                     <!-- input buscar -->
                         <div class="">
                                 <div class="input-group">
 
-                                  <input type="text" class="form-control" ng-model="buscarrevista.descricao">
+                                  <input type="text" class="form-control" ng-model="buscar.descricao">
 
                                   <span class="input-group-btn">
                                     <button class="btn btn-default" type="button">
@@ -304,7 +395,7 @@ padding: 5px 15px;
                       <th>Data de cadastro</th>
                       <th>Nome</th>
                       <tbody>
-                        <tr ng-repeat="use in users | filter:buscarusesta" ng-click="visualizarRevista($index,use)" ng-class="{'active': $index == ativo}">
+                        <tr ng-repeat="use in users | filter:buscar" ng-click="visualizarUser($index,use)" ng-class="{'active': $index == ativo_user}">
                           <td>{{use.data_cadastro}}</td>
                           <td>{{use.nome}}</td>
                         </tr>
@@ -322,11 +413,12 @@ padding: 5px 15px;
               </h4>
               <hr>
               <label><strong>E-mail:</strong><label>{{user_view.email}}</label></label
+              <label><strong>Ativo:</strong> <label id="ativo">{{user_view.ativo == 1 && 'SIM' || 'NÃO'}}</label></label>
               <label><strong>Data Cadastro:</strong> <label>{{user_view.data_cadastro}}</label></label>
 
-               <a href="#" data-toggle="modal" data-target="#modalCadastro"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar" ng-click="editarRevista(revista_view)"><span class="glyphicon glyphicon-edit"></span></a>
+               <a href="#" data-toggle="modal" data-target="#modalCadastroUser"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar"><span class="glyphicon glyphicon-edit"></span></a>
 
-              <a id="deletar_contato" class="tip" data-toggle="tooltip" title="Deletar" style="margin-bottom:10px"  role="button" ng-click="deletarRevista(revista_view.id_revista)"><span class="glyphicon glyphicon-trash"></span></a>
+              <a id="deletar_contato" class="tip" data-toggle="tooltip" title="Deletar" style="margin-bottom:10px"  role="button" ng-click="deletarUser(user_view.id)"><span class="glyphicon glyphicon-trash"></span></a>
 
             </div>
 
@@ -334,9 +426,8 @@ padding: 5px 15px;
 
 </div>
 
-
-<!-- Modal Cadastro Revista -->
-<div class="modal fade" id="modalCadastro" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<!-- Modal Cadastro User -->
+<div class="modal fade" id="modalCadastroUser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -346,32 +437,19 @@ padding: 5px 15px;
       <div class="modal-body">
 
         <form name="formCadastro">
-          <input type="hidden" value="0" ng-model="revista_view.id_revista">
-          <input type="hidden" value="0" id="imagem_capa" ng-model="revista_view.imagem_capa">
+          <input type="hidden" value="0" ng-model="user_view.id">
           <div class="form-group">
-            <input type="text" class="form-control" placeholder="Descrição"  ng-model="revista_view.descricao">
+            <input type="text" class="form-control" placeholder="Nome"  ng-model="user_view.nome">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" placeholder="Nº da edição"  ng-model="revista_view.edicao">
+            <input type="text" class="form-control" placeholder="E-mail"  ng-model="user_view.email">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control"  placeholder="Link"  ng-model="revista_view.link">
-          </div>
-          <div class="form-group">
-            <label >Imagem da Capa:</label>
-            <input type="file" id="fileupload" name="files[]" class="form-control"/>
-
-            <!-- The global progress bar -->
-            <div id="progress" class="progress">
-              <div class="progress-bar progress-bar-success"></div>
-            </div>
-            <!-- The container for the uploaded files -->
-            <div id="files" class="files"></div>
-
+            <input type="password" class="form-control"  placeholder="Senha"  ng-model="user_view.senha">
           </div>
           <div class="form-group">
             <label>Ativo:</label>
-            <select class="form-control" ng-model="revista_view.ativo">
+            <select class="form-control" ng-model="user_view.ativo">
               <option value="1">SIM</option>
               <option value="0">NÃO</option>
             </select>
@@ -381,7 +459,7 @@ padding: 5px 15px;
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary" ng-click="salvarRevista()">Salvar</button>
+        <button type="button" class="btn btn-primary" ng-click="salvarUser()">Salvar</button>
       </div>
     </div> <!-- /.modal-content -->
  </div><!-- /.modal-dialog -->
@@ -411,7 +489,7 @@ padding: 5px 15px;
 <script>
 $(function () {
     // Change this to the location of your server-side upload handler:
-    var url = 'server/';
+    /*var url = 'server/';
     $('#fileupload').fileupload({
         url: url,
         dataType: 'json',
@@ -437,7 +515,7 @@ $(function () {
             );
         }
     }).prop('disabled', !$.support.fileInput)
-      .parent().addClass($.support.fileInput ? undefined : 'disabled');
+      .parent().addClass($.support.fileInput ? undefined : 'disabled');*/
 });
 </script>
 

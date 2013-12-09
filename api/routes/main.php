@@ -7,6 +7,7 @@ $app->get("/checkauth", $authenticate($app));
 function logout()
 {
     unset($_SESSION['vrio']['auth']);
+    echo '{"logout":true}';
 }
 
 function login()
