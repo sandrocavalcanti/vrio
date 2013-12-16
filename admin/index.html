@@ -145,7 +145,9 @@ padding: 5px 15px;
   <ul id="menu" class="nav nav-pills hide">
     <li ng-class="{'active': 1 == menu_ativo}"><a href="#" ng-click="viewCustomer()">Clientes</a></li>
     <li ng-class="{'active': 2 == menu_ativo}"><a href="#" ng-click="viewBanheiro()">Banheiros</a></li>
-    <li ng-class="{'active': 3 == menu_ativo}"><a href="#" ng-click="viewUser()">Usuários</a></li>
+    <li ng-class="{'active': 3 == menu_ativo}"><a href="#" ng-click="viewProduto()">Produtos</a></li>
+    <li ng-class="{'active': 4 == menu_ativo}"><a href="#" ng-click="viewVenda()">Vendas</a></li>
+    <li ng-class="{'active': 9 == menu_ativo}"><a href="#" ng-click="viewUser()">Usuários</a></li>
     <li><a href="#" ng-click="logout()">Sair</a></li>
   </ul>
 
@@ -381,7 +383,162 @@ padding: 5px 15px;
     </div> <!-- /.modal-content -->
  </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!-- PRODUTO -->
+<div id="produto" class="row mt40 hide tela">
+   
+           <div class="tabbable tabs-left col-sm-7">
+
+              <div class="tab-content">
+                <a href="#" data-toggle="modal" data-target="#modalCadastroProduto" style="margin-bottom:10px" class="btn btn-success" role="button"><span class="glyphicon glyphicon-plus"></span></a>
+
+                  <!-- input buscar -->
+                      <div class="">
+                              <div class="input-group">
+
+                                <input type="text" class="form-control" ng-model="buscar.descricao">
+
+                                <span class="input-group-btn">
+                                  <button class="btn btn-default" type="button">
+                                    
+                                    <span class="glyphicon glyphicon-search"></span>
+
+                                  </button>
+                                </span>
+                              </div>
+                      </div>
+                    <!-- fim input buscar -->
+                
+                  <table class="table">
+                    <th>Id</th>
+                    <th>Descrição</th>
+                    <th>Valor</th>
+                    <th>Ativo</th>
+                    <tbody>
+                      <tr ng-repeat="prod in produtos | filter:buscar" ng-click="visualizarProduto($index,prod)" ng-class="{'active': $index == ativo_produto}">
+                        <td>{{prod.id}}</td>
+                        <td>{{prod.descricao}}</td>
+                        <td>{{prod.valor}}</td>
+                        <td>{{prod.ativo == 1 && 'SIM' || 'NÃO'}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+              </div>
+
+         
+          </div>
+
+          <div class="tab-content col-sm-5 tab-conteudo">
+            <h4 id="nome">
+              {{produto_view.descricao}}
+            </h4>
+           <hr>
+            <label><strong>Valor:</strong> <label id="endereco">{{produto_view.valor}}</label></label>
+            <label><strong>Ativo:</strong> <label id="ativo">{{produto_view.ativo == 1 && 'SIM' || 'NÃO'}}</label></label>
+
+            <a href="#" data-toggle="modal" data-target="#modalCadastroProduto"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar"><span class="glyphicon glyphicon-edit"></span></a>
+
+            <a id="deletar_contato" class="tip" data-toggle="tooltip" title="Deletar" style="margin-bottom:10px"  role="button" ng-click="deletarProduto(produto_view.id)"><span class="glyphicon glyphicon-trash"></span></a>
+
+          </div>
+
+</div> 
+
+<!-- Modal Cadastro Produto -->
+<div class="modal fade" id="modalCadastroProduto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Cadastro</h4>
+      </div>
+      <div class="modal-body">
+
+        <form name="formCadastro">
+          <input type="hidden" value="0" ng-model="produto_view.id">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Descrição"  ng-model="produto_view.descricao">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Valor"  ng-model="produto_view.valor">
+          </div>
+          <div class="form-group">
+            <label>Ativo:</label>
+            <select class="form-control" ng-model="produto_view.ativo">
+              <option value="1">SIM</option>
+              <option value="0">NÃO</option>
+            </select>
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" ng-click="salvarProduto()">Salvar</button>
+      </div>
+    </div> <!-- /.modal-content -->
+ </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
   
+
+  <!-- VENDAS -->
+  <div id="venda" class="row mt40 hide tela">
+     
+             <div class="tabbable tabs-left col-sm-7">
+
+                <div class="tab-content">
+
+                    <!-- input buscar -->
+                        <div class="">
+                                <div class="input-group">
+
+                                  <input type="text" class="form-control" ng-model="buscar.nome">
+
+                                  <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button">
+                                      
+                                      <span class="glyphicon glyphicon-search"></span>
+
+                                    </button>
+                                  </span>
+                                </div>
+                        </div>
+                      <!-- fim input buscar -->
+                  
+                    <table class="table">
+                      <th>Id</th>
+                      <th>Data de Venda</th>
+                      <th>Cliente</th>
+                      <th>Forma Pgto</th>
+                      <th>Valor</th>
+                      <tbody>
+                        <tr ng-repeat="vend in vendas | filter:buscar" ng-click="visualizarVenda($index,vend)" ng-class="{'active': $index == ativo_venda}">
+                          <td>{{vend.id}}</td>
+                          <td>{{vend.data_cadastro}}</td>
+                          <td>{{vend.cliente}}</td>
+                          <td>{{vend.forma_ogto}}</td>
+                          <td>{{vend.valor_total}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                </div>
+            </div>
+
+            <div class="tab-content col-sm-5 tab-conteudo">
+              <h4 id="nome">{{venda_view.id}} / {{venda_view.cliente}}</h4>
+              <hr>
+              <label><strong>Data:</strong> <label id="email">{{venda_view.data_cadastro}}</label></label>
+              <label><strong>Forma Pgto:</strong> <label id="celular">{{venda_view.forma_pgto}}</label></label>
+              <label><strong>Negociação ID:</strong> <label id="sexo">{{venda_view.negociacao_id}}</label></label>
+              <label><strong>Valor:</strong> <label id="ativo">{{venda_view.valor_total}}</label></label>
+              <hr>
+              <h4>Produtos</h4>
+            </div>
+
+  </div> 
+
   <!-- USER -->
   <div id="user" class="row mt40 hide tela">
      

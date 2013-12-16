@@ -1,6 +1,7 @@
 <?php
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
+date_default_timezone_set('America/Recife');
 
 require 'Slim/Slim.php';
 
@@ -25,5 +26,6 @@ require './routes/customer.php';
 require './routes/banheiro.php';
 require './routes/user.php';
 require './routes/produto.php';
+require './routes/venda.php';
  
 $app->run();

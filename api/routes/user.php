@@ -37,7 +37,8 @@ function addUser()
 
 function getUsers() 
 {
-    $sql = "SELECT * FROM tb_user ORDER BY nome ASC";
+    $sql = "SELECT *, DATE_FORMAT(data_cadastro,'%d/%m/%Y %H:%i') AS data_cadastro 
+            FROM tb_user ORDER BY nome ASC";
     try {
 
         $db = getConnection();

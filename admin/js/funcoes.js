@@ -47,8 +47,18 @@ function AdminCtrl($scope, $http, $window){
 		listarBanheiro();
 	}
 
-	$scope.viewUser = function() {
+	$scope.viewProduto = function() {
 		$scope.menu_ativo = 3;
+		listarProduto();
+	}
+
+	$scope.viewVenda = function() {
+		$scope.menu_ativo = 4;
+		listarVenda();
+	}
+
+	$scope.viewUser = function() {
+		$scope.menu_ativo = 9;
 		listarUser();
 	}
 
@@ -72,6 +82,26 @@ function AdminCtrl($scope, $http, $window){
 		});
 	}
 
+	var listarProduto = function () {
+		$http.get('../api/produto').success(function(data){
+			//console.log(data.error);
+			$scope.produtos = data;
+
+			$('.tela').addClass('hide');
+			$('#produto').removeClass('hide').fadeIn();
+		});
+	}
+
+	var listarVenda = function () {
+		$http.get('../api/venda').success(function(data){
+			//console.log(data.error);
+			$scope.vendas = data;
+
+			$('.tela').addClass('hide');
+			$('#venda').removeClass('hide').fadeIn();
+		});
+	}
+
 	var listarUser = function () {
 		$http.get('../api/user').success(function(data){
 			//console.log(data.error);
@@ -90,6 +120,16 @@ function AdminCtrl($scope, $http, $window){
 	$scope.visualizarBanheiro = function($index, banheiro){
 		$scope.banheiro_view = banheiro;
 		$scope.ativo_banheiro = $index;
+	}
+
+	$scope.visualizarProduto = function($index, produto){
+		$scope.produto_view = produto;
+		$scope.ativo_produto = $index;
+	}
+
+	$scope.visualizarVenda = function($index, venda){
+		$scope.venda_view = venda;
+		$scope.ativo_venda = $index;
 	}
 
 	$scope.visualizarUser = function($index, user){
@@ -150,6 +190,33 @@ function AdminCtrl($scope, $http, $window){
 		$(".alert").css({display: ''}).fadeOut(5000);
 	}
 
+	$scope.salvarProduto = function(){
+
+		if($scope.produto_view.id > 0){
+
+			$http.put('../api/produto/'+$scope.produto_view.id, $scope.produto_view).success(function(data){
+				$(".alert").css({display: 'block'});
+				$(".alert").addClass('alert-warning');
+				$("#msg_alert").html('Alterado com sucesso!');
+			
+			});
+
+		}else{
+
+			$http.post('../api/produto', $scope.produto_view).success(function(data){
+				$scope.produtos.unshift(data);
+				$(".alert").css({display: 'block'});
+				$(".alert").addClass('alert-success');
+				$("#msg_alert").html('Cadastrado com sucesso!');
+				
+			});
+
+		}
+		$scope.produto_view = {id:0, descricao:'', valor:0, ativo:0};
+		$('#modalCadastro').modal('hide');
+		$(".alert").css({display: ''}).fadeOut(5000);
+	}
+
 	$scope.salvarUser = function(){
 
 		if($scope.user_view.id > 0){
@@ -206,6 +273,22 @@ function AdminCtrl($scope, $http, $window){
 		
 	}
 
+	$scope.deletarProduto = function(){
+
+		if(confirm('Deseja realmente excluir este registro?') && $scope.produto_view.id > 0){
+
+			$http.delete('../api/produto/'+$scope.produto_view.id, $scope.produto_view).success(function(data){
+				$scope.produto_view = {id:0, descricao:'', valor:0, ativo:0};
+				$(".alert").css({display: 'block'});
+				$(".alert").addClass('alert-warning');
+				$("#msg_alert").html('Removido com sucesso!');
+				$(".alert").css({display: ''}).fadeOut(5000);
+			});
+
+		}
+		
+	}
+
 	$scope.deletarUser = function(){
 
 		if(confirm('Deseja realmente excluir este registro?') && $scope.user_view.id > 0){
@@ -239,6 +322,16 @@ function AdminCtrl($scope, $http, $window){
 		$scope.customer = {id:0, nome:'', sobrenome:'', email:'', ativo:0};
 		$scope.customer_view = {id:0, nome:'', sobrenome:'', email:'', ativo:0};
 		$scope.customers = [];
+
+		$scope.ativo_produto = 0;
+		$scope.produto_view = {id:0, descricao:'', valor:0, ativo:0};
+		$scope.produto = {id:0, descricao:'', valor:0, ativo:0};
+		$scope.produtos = [];
+
+		$scope.ativo_venda = 0;
+		$scope.venda_view = {id:0, valor_total:0, data_cadastro:'', cliente:'', id_customer:0, negociacao_id:0, forma_pgto:''};
+		$scope.venda = {id:0, valor_total:0, data_cadastro:'', cliente:'', id_customer:0, negociacao_id:0, forma_pgto:''};
+		$scope.vendas = [];
 
 		//checando login
 		$http.get('../api/checkauth').success(function(data){
