@@ -51,7 +51,7 @@ function getConnection()
     }else{
         $dbhost="localhost";
         $dbuser="root";
-        $dbpass="clickn";
+        $dbpass="root";
         $dbname="vrio";    
     }
     
