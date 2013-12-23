@@ -11,7 +11,7 @@ function addCustomer()
 {
     $request = \Slim\Slim::getInstance()->request();
     $customer = json_decode($request->getBody());
-    $sql = "INSERT INTO tb_customer (nome, sobrenome, email, sexo, celular, senha) 
+    $sql = "INSERT INTO tb_customer (nome, sobrenome, email, sexo, celular, cpf, senha) 
             VALUES (:nome, :sobrenome, :email, :sexo, :celular, :senha)";
     try {
         $db = getConnection();
@@ -21,6 +21,7 @@ function addCustomer()
         $stmt->bindParam("email", $customer->email);
         $stmt->bindParam("senha", $customer->senha);
         $stmt->bindParam("sexo", $customer->sexo);
+        $stmt->bindParam("cpf", $customer->sexo);
         $stmt->bindParam("celular", $customer->celular);
         
         $stmt->execute();
@@ -89,7 +90,7 @@ function updateCustomer($id) {
     $body = $request->getBody();
     $customer = json_decode($body);
     $sql = "UPDATE tb_customer 
-            SET nome=:nome, sobrenome=:sobrenome, email=:email, sexo=:sexo, celular=:celular, ativo=:ativo 
+            SET nome=:nome, sobrenome=:sobrenome, email=:email, sexo=:sexo, celular=:celular, cpf=:cpf, ativo=:ativo 
             WHERE id=:id";
     try {
         $db = getConnection();
@@ -99,6 +100,7 @@ function updateCustomer($id) {
         $stmt->bindParam("email", $customer->email);
         $stmt->bindParam("ativo", $customer->ativo);
         $stmt->bindParam("sexo", $customer->sexo);
+        $stmt->bindParam("cpf", $customer->cpf);
         $stmt->bindParam("celular", $customer->celular);
         
         $stmt->bindParam("id", $id);

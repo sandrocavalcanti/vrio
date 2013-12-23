@@ -319,8 +319,8 @@ function AdminCtrl($scope, $http, $window){
 		$scope.banheiros = [];
 
 		$scope.ativo_customer = 0;
-		$scope.customer = {id:0, nome:'', sobrenome:'', email:'', ativo:0};
-		$scope.customer_view = {id:0, nome:'', sobrenome:'', email:'', ativo:0};
+		$scope.customer = {id:0, nome:'', sobrenome:'', email:'', sexo:'', celular:'', cpf:'', ativo:0};
+		$scope.customer_view = {id:0, nome:'', sobrenome:'', email:'', sexo:'', celular:'', cpf:'', ativo:0};
 		$scope.customers = [];
 
 		$scope.ativo_produto = 0;

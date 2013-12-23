@@ -147,6 +147,7 @@ padding: 5px 15px;
     <li ng-class="{'active': 2 == menu_ativo}"><a href="#" ng-click="viewBanheiro()">Banheiros</a></li>
     <li ng-class="{'active': 3 == menu_ativo}"><a href="#" ng-click="viewProduto()">Produtos</a></li>
     <li ng-class="{'active': 4 == menu_ativo}"><a href="#" ng-click="viewVenda()">Vendas</a></li>
+    <li ng-class="{'active': 5 == menu_ativo}"><a href="#" ng-click="viewResgate()">Resgate</a></li>
     <li ng-class="{'active': 9 == menu_ativo}"><a href="#" ng-click="viewUser()">Usuários</a></li>
     <li><a href="#" ng-click="logout()">Sair</a></li>
   </ul>
@@ -213,6 +214,7 @@ padding: 5px 15px;
                 {{customer_view.nome}} {{customer_view.sobrenome}}
               </h4>
              <hr>
+              <label><strong>CPF:</strong> <label id="email">{{customer_view.cpf}}</label></label>
               <label><strong>E-mail:</strong> <label id="email">{{customer_view.email}}</label></label>
               <label><strong>Celular:</strong> <label id="celular">{{customer_view.celular}}</label></label>
               <label><strong>Sexo:</strong> <label id="sexo">{{customer_view.sexo}}</label></label>
