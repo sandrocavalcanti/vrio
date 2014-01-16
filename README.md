@@ -1,4 +1,4 @@
-Aplicativo vrio
+Aplicativo Vrio
 ====
 
 Este projeto consiste em um aplicativo mobile Sencha Touch integrado com uma API em Slim PHP + MySQL, incluindo acesso administrativo atravẽs de uma interface WEB com Angular JS.
