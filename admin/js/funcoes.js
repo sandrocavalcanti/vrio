@@ -57,6 +57,11 @@ function AdminCtrl($scope, $http, $window){
 		listarVenda();
 	}
 
+	$scope.viewPonto = function() {
+		$scope.menu_ativo = 6;
+		listarPonto();
+	}
+
 	$scope.viewUser = function() {
 		$scope.menu_ativo = 9;
 		listarUser();
@@ -102,6 +107,16 @@ function AdminCtrl($scope, $http, $window){
 		});
 	}
 
+	var listarPonto = function () {
+		$http.get('../api/ponto').success(function(data){
+			//console.log(data.error);
+			$scope.pontos = data;
+
+			$('.tela').addClass('hide');
+			$('#ponto').removeClass('hide').fadeIn();
+		});
+	}
+
 	var listarUser = function () {
 		$http.get('../api/user').success(function(data){
 			//console.log(data.error);
@@ -130,6 +145,11 @@ function AdminCtrl($scope, $http, $window){
 	$scope.visualizarVenda = function($index, venda){
 		$scope.venda_view = venda;
 		$scope.ativo_venda = $index;
+	}
+
+	$scope.visualizarPonto = function($index, ponto){
+		$scope.ponto_view = ponto;
+		$scope.ativo_ponto = $index;
 	}
 
 	$scope.visualizarUser = function($index, user){
@@ -217,6 +237,33 @@ function AdminCtrl($scope, $http, $window){
 		$(".alert").css({display: ''}).fadeOut(5000);
 	}
 
+	$scope.salvarPonto = function(){
+
+		if($scope.ponto_view.id > 0){
+
+			$http.put('../api/ponto/'+$scope.ponto_view.id, $scope.ponto_view).success(function(data){
+				$(".alert").css({display: 'block'});
+				$(".alert").addClass('alert-warning');
+				$("#msg_alert").html('Alterado com sucesso!');
+			
+			});
+
+		}else{
+
+			$http.post('../api/ponto', $scope.ponto_view).success(function(data){
+				$scope.pontos.unshift(data);
+				$(".alert").css({display: 'block'});
+				$(".alert").addClass('alert-success');
+				$("#msg_alert").html('Cadastrado com sucesso!');
+				
+			});
+
+		}
+		$scope.ponto_view = {id:0, descricao:'', logradouto:'', numero:'', bairro:'', cep:'', cidade:'', uf:'', ativo:0};
+		$('#modalCadastro').modal('hide');
+		$(".alert").css({display: ''}).fadeOut(5000);
+	}
+
 	$scope.salvarUser = function(){
 
 		if($scope.user_view.id > 0){
@@ -289,6 +336,22 @@ function AdminCtrl($scope, $http, $window){
 		
 	}
 
+	$scope.deletarPonto = function(){
+
+		if(confirm('Deseja realmente excluir este registro?') && $scope.ponto_view.id > 0){
+
+			$http.delete('../api/ponto/'+$scope.ponto_view.id, $scope.ponto_view).success(function(data){
+				$(".alert").css({display: 'block'});
+				$(".alert").addClass('alert-warning');
+				$("#msg_alert").html('Removido com sucesso!');
+				$(".alert").css({display: ''}).fadeOut(5000);
+				$scope.ponto_view = {id:0, descricao:'', logradouto:'', numero:'', bairro:'', cep:'', cidade:'', uf:'', ativo:0};
+			});
+
+		}
+		
+	}
+
 	$scope.deletarUser = function(){
 
 		if(confirm('Deseja realmente excluir este registro?') && $scope.user_view.id > 0){
@@ -332,6 +395,11 @@ function AdminCtrl($scope, $http, $window){
 		$scope.venda_view = {id:0, valor_total:0, data_cadastro:'', cliente:'', id_customer:0, negociacao_id:0, forma_pgto:''};
 		$scope.venda = {id:0, valor_total:0, data_cadastro:'', cliente:'', id_customer:0, negociacao_id:0, forma_pgto:''};
 		$scope.vendas = [];
+
+		$scope.ativo_ponto = 0;
+		$scope.ponto_view = {id:0, descricao:'', logradouto:'', numero:'', bairro:'', cep:'', cidade:'', uf:'', ativo:0};
+		$scope.ponto = {id:0, descricao:'', logradouto:'', numero:'', bairro:'', cep:'', cidade:'', uf:'', ativo:0};
+		$scope.pontos = [];
 
 		//checando login
 		$http.get('../api/checkauth').success(function(data){

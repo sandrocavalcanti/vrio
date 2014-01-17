@@ -148,6 +148,7 @@ padding: 5px 15px;
     <li ng-class="{'active': 3 == menu_ativo}"><a href="#" ng-click="viewProduto()">Produtos</a></li>
     <li ng-class="{'active': 4 == menu_ativo}"><a href="#" ng-click="viewVenda()">Vendas</a></li>
     <li ng-class="{'active': 5 == menu_ativo}"><a href="#" ng-click="viewResgate()">Resgate</a></li>
+    <li ng-class="{'active': 6 == menu_ativo}"><a href="#" ng-click="viewPonto()">Pontos de Resgate</a></li>
     <li ng-class="{'active': 9 == menu_ativo}"><a href="#" ng-click="viewUser()">Usuários</a></li>
     <li><a href="#" ng-click="logout()">Sair</a></li>
   </ul>
@@ -540,6 +541,115 @@ padding: 5px 15px;
             </div>
 
   </div> 
+
+  <!-- PONTOS DE RESGATE -->
+<div id="ponto" class="row mt40 hide tela">
+   
+           <div class="tabbable tabs-left col-sm-7">
+
+              <div class="tab-content">
+                <a href="#" data-toggle="modal" data-target="#modalCadastroPonto" style="margin-bottom:10px" class="btn btn-success" role="button"><span class="glyphicon glyphicon-plus"></span></a>
+
+                  <!-- input buscar -->
+                      <div class="">
+                              <div class="input-group">
+
+                                <input type="text" class="form-control" ng-model="buscar.nome">
+
+                                <span class="input-group-btn">
+                                  <button class="btn btn-default" type="button">
+                                    
+                                    <span class="glyphicon glyphicon-search"></span>
+
+                                  </button>
+                                </span>
+                              </div>
+                      </div>
+                    <!-- fim input buscar -->
+                
+                  <table class="table">
+                    <th>Data de cadastro</th>
+                    <th>Descrição</th>
+                    <tbody>
+                      <tr ng-repeat="pont in pontos | filter:buscar" ng-click="visualizarPonto($index,pont)" ng-class="{'active': $index == ativo_ponto}">
+                        <td>{{pont.data_cadastro}}</td>
+                        <td>{{pont.descricao}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+              </div>
+
+         
+          </div>
+
+          <div class="tab-content col-sm-5 tab-conteudo">
+            <h4 id="nome">
+              {{ponto_view.descricao}}
+            </h4>
+           <hr>
+            <label><strong>Endereço:</strong> <label id="endereco">{{ponto_view.logradouro}}, {{ponto_view.numero}}, {{ponto_view.bairro}}, {{ponto_view.cep}}, {{ponto_view.cidade}}/{{ponto_view.uf}}
+            </label></label>
+            <label><strong>Ativo:</strong> <label id="ativo">{{ponto_view.ativo == 1 && 'SIM' || 'NÃO'}}</label></label>
+
+            <a href="#" data-toggle="modal" data-target="#modalCadastroPonto"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar"><span class="glyphicon glyphicon-edit"></span></a>
+
+            <a id="deletar_contato" class="tip" data-toggle="tooltip" title="Deletar" style="margin-bottom:10px"  role="button" ng-click="deletarPonto(ponto_view.id)"><span class="glyphicon glyphicon-trash"></span></a>
+
+          </div>
+
+</div> 
+
+<!-- Modal Cadastro Ponto -->
+<div class="modal fade" id="modalCadastroPonto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Cadastro</h4>
+      </div>
+      <div class="modal-body">
+
+        <form name="formCadastro">
+          <input type="hidden" value="0" ng-model="ponto_view.id">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Descrição"  ng-model="ponto_view.descricao">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Logradouro"  ng-model="ponto_view.logradouro">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Número"  ng-model="ponto_view.numero">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Bairro"  ng-model="ponto_view.bairro">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="CEP"  ng-model="ponto_view.cep">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Cidade"  ng-model="ponto_view.cidade">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="UF"  ng-model="ponto_view.uf">
+          </div>
+          <div class="form-group">
+            <label>Ativo:</label>
+            <select class="form-control" ng-model="ponto_view.ativo">
+              <option value="1">SIM</option>
+              <option value="0">NÃO</option>
+            </select>
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" ng-click="salvarPonto()">Salvar</button>
+      </div>
+    </div> <!-- /.modal-content -->
+ </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
   <!-- USER -->
   <div id="user" class="row mt40 hide tela">

@@ -27,5 +27,6 @@ require './routes/banheiro.php';
 require './routes/user.php';
 require './routes/produto.php';
 require './routes/venda.php';
+require './routes/ponto.php';
  
 $app->run();
