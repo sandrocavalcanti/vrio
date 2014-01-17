@@ -1,6 +1,7 @@
 <?php 
 /* CUSTOMER */
 $app->post('/customer', 'addCustomer');
+$app->post('/customerlogin', 'loginCustomer');
 $app->get('/customer', $authenticate($app), 'getCustomers');
 $app->get('/customer/:id', $authenticate($app), 'getCustomer');
 $app->get('/customer/search/:query', $authenticate($app), 'findCustomerByName');
@@ -120,6 +121,34 @@ function deleteCustomer($id) {
         $stmt->bindParam("id", $id);
         $stmt->execute();
         $db = null;
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function loginCustomer() {
+    $request = \Slim\Slim::getInstance()->request();
+    $post = $request->post();
+
+    $sql = "SELECT id FROM tb_customer WHERE celular=:celular AND senha=:senha";
+
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $senha = sha1($post['senha']);
+        $stmt->bindParam("senha", $senha);
+        $stmt->bindParam("celular", $post['celular']);
+        
+        $return = $stmt->execute();
+        print $return; exit;
+        $db = null;
+        if($return > 0){
+            $retorno = 1;
+        }else{
+            $retorno = 0;
+        }
+        echo json_encode($retorno);
+
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
