@@ -1,7 +1,9 @@
 <?php 
+require_once('./lib/Common.php');
+
 /* CUSTOMER */
 $app->post('/customer', 'addCustomer');
-$app->post('/customerlogin', 'loginCustomer');
+$app->get('/customerlogin', 'loginCustomer');
 $app->get('/customer', $authenticate($app), 'getCustomers');
 $app->get('/customer/:id', $authenticate($app), 'getCustomer');
 $app->get('/customer/search/:query', $authenticate($app), 'findCustomerByName');
@@ -128,26 +130,35 @@ function deleteCustomer($id) {
 
 function loginCustomer() {
     $request = \Slim\Slim::getInstance()->request();
-    $post = $request->post();
+    $get = $request->get();
 
-    $sql = "SELECT id FROM tb_customer WHERE celular=:celular AND senha=:senha";
+    $sql = "SELECT id, nome, sobrenome, email, celular, sexo, cpf, data_nascimento, uf
+            FROM tb_customer WHERE celular=:celular AND senha=:senha AND ativo=1";
 
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);
-        $senha = sha1($post['senha']);
+        $senha = sha1($get['senha']);
         $stmt->bindParam("senha", $senha);
-        $stmt->bindParam("celular", $post['celular']);
-        
-        $return = $stmt->execute();
-        print $return; exit;
+        $stmt->bindParam("celular", $get['celular']);
+        $stmt->execute();
+        $customer = $stmt->fetchAll(PDO::FETCH_OBJ);
         $db = null;
-        if($return > 0){
-            $retorno = 1;
+
+        if(isset($customer[0]->id)){
+            //$customer[0]->data_nascimento = Common::mysqlToBr($customer[0]->data_nascimento);
+            $retorno['customer'] = $customer;
         }else{
             $retorno = 0;
         }
-        echo json_encode($retorno);
+        
+        header('Content-Type: text/javascript; charset=utf8');
+        // header('Access-Control-Allow-Origin: http://www.example.com/');
+        // header('Access-Control-Max-Age: 3628800');
+        // header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+
+        $callback = $get['callback'];
+        echo $callback.'('.json_encode($customer).');';
 
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
