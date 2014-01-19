@@ -6,6 +6,7 @@ $app->get('/venda/:id',  $authenticate($app), 'getVenda');
 $app->get('/venda/search/:query', $authenticate($app), 'findVendaByName');
 $app->put('/venda/:id', $authenticate($app), 'updateVenda');
 $app->delete('/venda/:id', $authenticate($app), 'deleteVenda');
+$app->get('/vendasapp', 'getVendasAtivas');
 
 function addVenda()
 {
@@ -108,6 +109,39 @@ function deleteVenda($id) {
         $stmt->bindParam("id", $id);
         $stmt->execute();
         $db = null;
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function getVendasAtivas() {
+    $request = \Slim\Slim::getInstance()->request();
+    
+    $get = $request->get();
+
+    try {  
+
+        $sql = "SELECT v.id, DATE_FORMAT(v.data_cadastro,'%d/%m/%Y') AS data_cadastro, 
+                REPLACE(REPLACE(REPLACE(FORMAT(v.valor_total, 2), '.', '@'), ',', '.'), '@', ',') AS valor, 
+                FORMAT(vp.qtde, 0) AS qtde
+                FROM tb_venda_produto vp INNER JOIN tb_venda v ON v.id = vp.id_venda
+                WHERE vp.resgatado = 0 AND v.id_customer=:id
+                ORDER BY v.data_cadastro ASC";
+
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("id", $get['id']);
+        $stmt->execute();
+        $vendas = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        
+        $retorno['vendas'] = $vendas;
+
+        header('Content-Type: text/javascript; charset=utf8');
+
+        $callback = $get['callback'];
+        echo $callback.'('.json_encode($retorno ).');';
+
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }

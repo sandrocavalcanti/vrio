@@ -6,6 +6,7 @@ $app->get('/banheiro/:id',  $authenticate($app), 'getBanheiro');
 $app->get('/banheiro/search/:query', $authenticate($app), 'findBanheiroByName');
 $app->put('/banheiro/:id', $authenticate($app), 'updateBanheiro');
 $app->delete('/banheiro/:id', $authenticate($app), 'deleteBanheiro');
+$app->get('/banheirosapp', 'getBanheirosApp');
 
 function addBanheiro()
 {
@@ -120,6 +121,33 @@ function deleteBanheiro($id) {
         $stmt->bindParam("id", $id);
         $stmt->execute();
         $db = null;
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function getBanheirosApp() {
+    $request = \Slim\Slim::getInstance()->request();
+    
+    $get = $request->get();
+
+    try {  
+
+        $sql = "SELECT * FROM tb_banheiro WHERE ativo = 1";
+
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        $banheiros = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        
+        $retorno['banheiros'] = $banheiros;
+
+        header('Content-Type: text/javascript; charset=utf8');
+
+        $callback = $get['callback'];
+        echo $callback.'('.json_encode($retorno ).');';
+
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }

@@ -2,8 +2,9 @@
 require_once('./lib/Common.php');
 
 /* CUSTOMER */
-$app->post('/customer', 'addCustomer');
-$app->get('/customerlogin', 'loginCustomer');
+$app->get('/customerlogin', 'loginAppCustomer');
+$app->post('/customerupdate', 'updateAppCustomer');
+$app->post('/customerinsert', 'addAppCustomer');
 $app->get('/customer', $authenticate($app), 'getCustomers');
 $app->get('/customer/:id', $authenticate($app), 'getCustomer');
 $app->get('/customer/search/:query', $authenticate($app), 'findCustomerByName');
@@ -128,7 +129,7 @@ function deleteCustomer($id) {
     }
 }
 
-function loginCustomer() {
+function loginAppCustomer() {
     $request = \Slim\Slim::getInstance()->request();
     $get = $request->get();
 
@@ -146,22 +147,120 @@ function loginCustomer() {
         $db = null;
 
         if(isset($customer[0]->id)){
-            //$customer[0]->data_nascimento = Common::mysqlToBr($customer[0]->data_nascimento);
             $retorno['customer'] = $customer;
         }else{
             $retorno = 0;
         }
         
         header('Content-Type: text/javascript; charset=utf8');
-        // header('Access-Control-Allow-Origin: http://www.example.com/');
-        // header('Access-Control-Max-Age: 3628800');
-        // header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 
         $callback = $get['callback'];
         echo $callback.'('.json_encode($customer).');';
 
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function updateAppCustomer() {
+    $request = \Slim\Slim::getInstance()->request();
+    
+    $post = $request->post();
+
+    try {  
+
+        if(!existeCustomer($post, true)){
+            $sql = "UPDATE tb_customer 
+                    SET sobrenome=:sobrenome, email=:email, sexo=:sexo, celular=:celular, 
+                    cpf=:cpf, data_nascimento=:data_nascimento, uf=:uf
+                    WHERE id=:id";
+            
+            $data_nascimento = date('Y-m-d', strtotime($post['data_nascimento']));
+
+            $db = getConnection();
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam("sobrenome", $post['sobrenome']);
+            $stmt->bindParam("email", $post['email']);
+            $stmt->bindParam("sexo", $post['sexo']);
+            $stmt->bindParam("cpf", $post['cpf']);
+            $stmt->bindParam("celular", $post['celular']);
+            $stmt->bindParam("data_nascimento", $data_nascimento);
+            $stmt->bindParam("uf", $post['uf']);
+            $stmt->bindParam("id", $post['id']);
+            $stmt->execute();
+            $db = null;
+
+            $retorno = 1;
+        }else{
+            $retorno = 0;
+        }
+        
+        echo json_encode($retorno);
+
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function addAppCustomer()
+{
+    $request = \Slim\Slim::getInstance()->request();
+    $post = $request->post();
+
+    if(!existeCustomer($post)){
+        $sql = "INSERT INTO tb_customer (id, nome, sobrenome, email, sexo, celular, cpf, senha, data_cadastro) 
+                VALUES (NULL, :nome, :sobrenome, :email, :sexo, :celular, :cpf, :senha, NOW())";
+        try {
+            $senha = sha1($post['senha']);
+
+            $db = getConnection();
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam("nome", $post['nome']);
+            $stmt->bindParam("sobrenome", $post['sobrenome']);
+            $stmt->bindParam("email", $post['email']);
+            $stmt->bindParam("senha", $senha);
+            $stmt->bindParam("sexo", $post['sexo']);
+            $stmt->bindParam("cpf", $post['cpf']);
+            $stmt->bindParam("celular", $post['celular']);
+            
+            $stmt->execute();
+            $id = $db->lastInsertId();
+            $db = null;
+            
+            $retorno = $id;
+
+        } catch(PDOException $e) {
+            $retorno = 0;
+        }
+
+    }else{
+        $retorno = 0;
+    }
+
+    echo json_encode($retorno);
+
+}
+
+function existeCustomer($dados, $alteracao=false)
+{
+    try {
+
+        $filtro_alteracao = $alteracao ? " AND id <>:id " : "";
+
+        //verificando se ja existe um registro com o cpf ou celular informado
+        $sql = "SELECT id FROM tb_customer WHERE (celular=:celular OR cpf =:cpf) ".$filtro_alteracao;
+
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("cpf", $dados['cpf']);
+        $stmt->bindParam("celular", $dados['celular']);
+        if($alteracao){$stmt->bindParam("id", $dados['id']);}
+        $stmt->execute();
+        $existe = $stmt->rowCount() > 0 ? true : false;
+
+        return $existe;
+    } catch(PDOException $e) {
+        return false;
     }
 }
 ?>
