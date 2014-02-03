@@ -11,7 +11,7 @@ function addPonto()
 {
     $request = \Slim\Slim::getInstance()->request();
     $ponto = json_decode($request->getBody());
-    $sql = "INSERT INTO tb_ponto_resgate (descricao, logradouro, numero, bairro, cep, cidade, uf, data_cadastro) 
+    $sql = "INSERT INTO tb_ponto_resgate (descricao, logradouro, numero, bairro, cep, cidade, uf, latitude, longitude, data_cadastro) 
             VALUES (:descricao, :logradouro, :numero, :bairro, :cep, :cidade, :uf, NOW())";
     try {
         $db = getConnection();
@@ -23,6 +23,8 @@ function addPonto()
         $stmt->bindParam("cep", $ponto->cep);
         $stmt->bindParam("cidade", $ponto->cidade);
         $stmt->bindParam("uf", $ponto->uf);
+        $stmt->bindParam("latitude", $ponto->latitude);
+        $stmt->bindParam("longitude", $ponto->longitude);
         
         $stmt->execute();
         $ponto->id = $db->lastInsertId();
@@ -89,7 +91,7 @@ function updatePonto($id) {
     $body = $request->getBody();
     $ponto = json_decode($body);
     $sql = "UPDATE tb_ponto_resgate SET descricao=:descricao, logradouro=:logradouro, numero=:numero,
-    		bairro=:bairro, cep=:cep, cidade=:cidade, uf=:uf,  ativo=:ativo
+    		bairro=:bairro, cep=:cep, cidade=:cidade, uf=:uf, latitude=:latitude, longitude=:longitude, ativo=:ativo
     		WHERE id=:id";
     try {
         $db = getConnection();
@@ -101,6 +103,8 @@ function updatePonto($id) {
         $stmt->bindParam("cep", $ponto->cep);
         $stmt->bindParam("cidade", $ponto->cidade);
         $stmt->bindParam("uf", $ponto->uf);
+        $stmt->bindParam("latitude", $ponto->latitude);
+        $stmt->bindParam("longitude", $ponto->longitude);
         $stmt->bindParam("ativo", $ponto->ativo);
         
         $stmt->bindParam("id", $id);

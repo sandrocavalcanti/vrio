@@ -12,8 +12,8 @@ function addBanheiro()
 {
     $request = \Slim\Slim::getInstance()->request();
     $banheiro = json_decode($request->getBody());
-    $sql = "INSERT INTO tb_banheiro (descricao, logradouro, numero, bairro, cep, cidade, uf, data_cadastro) 
-            VALUES (:descricao, :logradouro, :numero, :bairro, :cep, :cidade, :uf, NOW())";
+    $sql = "INSERT INTO tb_banheiro (descricao, logradouro, numero, bairro, cep, cidade, uf, latitude, longitude, tipo, data_cadastro) 
+            VALUES (:descricao, :logradouro, :numero, :bairro, :cep, :cidade, :uf, :latitude, :longitude, :tipo, NOW())";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);
@@ -24,6 +24,9 @@ function addBanheiro()
         $stmt->bindParam("cep", $banheiro->cep);
         $stmt->bindParam("cidade", $banheiro->cidade);
         $stmt->bindParam("uf", $banheiro->uf);
+        $stmt->bindParam("latitude", $banheiro->latitude);
+        $stmt->bindParam("longitude", $banheiro->longitude);
+        $stmt->bindParam("tipo", $banheiro->tipo);
         
         $stmt->execute();
         $banheiro->id = $db->lastInsertId();
@@ -90,7 +93,8 @@ function updateBanheiro($id) {
     $body = $request->getBody();
     $banheiro = json_decode($body);
     $sql = "UPDATE tb_banheiro SET descricao=:descricao, logradouro=:logradouro, numero=:numero,
-    		bairro=:bairro, cep=:cep, cidade=:cidade, uf=:uf,  ativo=:ativo
+    		bairro=:bairro, cep=:cep, cidade=:cidade, uf=:uf, latitude=:latitude, longitude=:longitude, tipo=:tipo, 
+            ativo=:ativo
     		WHERE id=:id";
     try {
         $db = getConnection();
@@ -102,6 +106,9 @@ function updateBanheiro($id) {
         $stmt->bindParam("cep", $banheiro->cep);
         $stmt->bindParam("cidade", $banheiro->cidade);
         $stmt->bindParam("uf", $banheiro->uf);
+        $stmt->bindParam("latitude", $banheiro->latitude);
+        $stmt->bindParam("longitude", $banheiro->longitude);
+        $stmt->bindParam("tipo", $banheiro->tipo);
         $stmt->bindParam("ativo", $banheiro->ativo);
         
         $stmt->bindParam("id", $id);

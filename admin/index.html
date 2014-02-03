@@ -144,11 +144,11 @@ padding: 5px 15px;
 
   <ul id="menu" class="nav nav-pills hide">
     <li ng-class="{'active': 1 == menu_ativo}"><a href="#" ng-click="viewCustomer()">Clientes</a></li>
-    <li ng-class="{'active': 2 == menu_ativo}"><a href="#" ng-click="viewBanheiro()">Banheiros</a></li>
+    <li ng-class="{'active': 2 == menu_ativo}"><a href="#" ng-click="viewBanheiro()">Locais</a></li>
     <li ng-class="{'active': 3 == menu_ativo}"><a href="#" ng-click="viewProduto()">Produtos</a></li>
     <li ng-class="{'active': 4 == menu_ativo}"><a href="#" ng-click="viewVenda()">Vendas</a></li>
     <li ng-class="{'active': 5 == menu_ativo}"><a href="#" ng-click="viewResgate()">Resgate</a></li>
-    <li ng-class="{'active': 6 == menu_ativo}"><a href="#" ng-click="viewPonto()">Pontos de Resgate</a></li>
+    <!-- <li ng-class="{'active': 6 == menu_ativo}"><a href="#" ng-click="viewPonto()">Pontos de Resgate</a></li> -->
     <li ng-class="{'active': 9 == menu_ativo}"><a href="#" ng-click="viewUser()">Usuários</a></li>
     <li><a href="#" ng-click="logout()">Sair</a></li>
   </ul>
@@ -305,10 +305,12 @@ padding: 5px 15px;
                 
                   <table class="table">
                     <th>Data de cadastro</th>
+                    <th>Tipo</th>
                     <th>Descrição</th>
                     <tbody>
                       <tr ng-repeat="banh in banheiros | filter:buscar" ng-click="visualizarBanheiro($index,banh)" ng-class="{'active': $index == ativo_banheiro}">
                         <td>{{banh.data_cadastro}}</td>
+                        <td>{{banh.tipo == 'B' && 'Banheiro' || 'Ponto de Resgate'}}</td>
                         <td>{{banh.descricao}}</td>
                       </tr>
                     </tbody>
@@ -321,11 +323,16 @@ padding: 5px 15px;
 
           <div class="tab-content col-sm-5 tab-conteudo">
             <h4 id="nome">
+              <label><strong>Tipo:</strong> <label id="tipo">{{banheiro_view.tipo == 'B' && 'Banheiro' || 'Ponto de Resgate'}}</label></label>
               {{banheiro_view.descricao}}
             </h4>
            <hr>
-            <label><strong>Endereço:</strong> <label id="endereco">{{banheiro_view.logradouro}}, {{banheiro_view.numero}}, {{banheiro_view.bairro}}, {{banheiro_view.cep}}, {{banheiro_view.cidade}}/{{banheiro_view.uf}}
-            </label></label>
+            <label>
+              <strong>Endereço:</strong> 
+              <label id="endereco">
+                {{banheiro_view.logradouro}}, {{banheiro_view.numero}}, {{banheiro_view.bairro}}, {{banheiro_view.cep}}, {{banheiro_view.cidade}}/{{banheiro_view.uf}}
+              </label>
+            </label>
             <label><strong>Ativo:</strong> <label id="ativo">{{banheiro_view.ativo == 1 && 'SIM' || 'NÃO'}}</label></label>
 
             <a href="#" data-toggle="modal" data-target="#modalCadastroBanheiro"  class="btn-md tip" role="button" data-toggle="tooltip" title="Editar"><span class="glyphicon glyphicon-edit"></span></a>
@@ -349,6 +356,13 @@ padding: 5px 15px;
         <form name="formCadastro">
           <input type="hidden" value="0" ng-model="banheiro_view.id">
           <div class="form-group">
+            <label>Tipo:</label>
+            <select class="form-control" ng-model="banheiro_view.tipo">
+              <option value="B">Banheiro</option>
+              <option value="P">Ponto de Resgate</option>
+            </select>
+          </div>
+          <div class="form-group">
             <input type="text" class="form-control" placeholder="Descrição"  ng-model="banheiro_view.descricao">
           </div>
           <div class="form-group">
@@ -368,6 +382,12 @@ padding: 5px 15px;
           </div>
           <div class="form-group">
             <input type="text" class="form-control" placeholder="UF"  ng-model="banheiro_view.uf">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Latitude"  ng-model="banheiro_view.latitude">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Longitude"  ng-model="banheiro_view.longitude">
           </div>
           <div class="form-group">
             <label>Ativo:</label>
@@ -543,14 +563,14 @@ padding: 5px 15px;
   </div> 
 
   <!-- PONTOS DE RESGATE -->
-<div id="ponto" class="row mt40 hide tela">
+<!-- <div id="ponto" class="row mt40 hide tela">
    
            <div class="tabbable tabs-left col-sm-7">
 
               <div class="tab-content">
                 <a href="#" data-toggle="modal" data-target="#modalCadastroPonto" style="margin-bottom:10px" class="btn btn-success" role="button"><span class="glyphicon glyphicon-plus"></span></a>
 
-                  <!-- input buscar -->
+                  <!-- input buscar 
                       <div class="">
                               <div class="input-group">
 
@@ -565,7 +585,7 @@ padding: 5px 15px;
                                 </span>
                               </div>
                       </div>
-                    <!-- fim input buscar -->
+                    <!-- fim input buscar 
                 
                   <table class="table">
                     <th>Data de cadastro</th>
@@ -600,7 +620,7 @@ padding: 5px 15px;
 
 </div> 
 
-<!-- Modal Cadastro Ponto -->
+Modal Cadastro Ponto
 <div class="modal fade" id="modalCadastroPonto" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -634,6 +654,12 @@ padding: 5px 15px;
             <input type="text" class="form-control" placeholder="UF"  ng-model="ponto_view.uf">
           </div>
           <div class="form-group">
+            <input type="text" class="form-control" placeholder="Latitude"  ng-model="ponto_view.latitude">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Longitude"  ng-model="ponto_view.longitude">
+          </div>
+          <div class="form-group">
             <label>Ativo:</label>
             <select class="form-control" ng-model="ponto_view.ativo">
               <option value="1">SIM</option>
@@ -647,8 +673,8 @@ padding: 5px 15px;
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
         <button type="button" class="btn btn-primary" ng-click="salvarPonto()">Salvar</button>
       </div>
-    </div> <!-- /.modal-content -->
- </div><!-- /.modal-dialog -->
+    </div> <!-- /.modal-content
+ </div><!-- /.modal-dialog 
 </div><!-- /.modal -->
 
   <!-- USER -->

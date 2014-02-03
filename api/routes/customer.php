@@ -194,6 +194,9 @@ function updateAppCustomer() {
         }else{
             $retorno = 0;
         }
+
+        header("Access-Control-Allow-Origin: *");
+        header('Access-Control-Allow-Headers: X-Requested-With');
         
         echo json_encode($retorno);
 
@@ -237,6 +240,9 @@ function addAppCustomer()
         $retorno = 0;
     }
 
+    header("Access-Control-Allow-Origin: *");
+    header('Access-Control-Allow-Headers: X-Requested-With');
+    
     echo json_encode($retorno);
 
 }
