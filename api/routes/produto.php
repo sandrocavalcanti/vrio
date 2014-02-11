@@ -6,6 +6,7 @@ $app->get('/produto/:id',  $authenticate($app), 'getProduto');
 $app->get('/produto/search/:query', $authenticate($app), 'findProdutoByName');
 $app->put('/produto/:id', $authenticate($app), 'updateProduto');
 $app->delete('/produto/:id', $authenticate($app), 'deleteProduto');
+$app->get('/produtosapp', 'getProdutosApp');
 
 function addProduto()
 {
@@ -109,6 +110,33 @@ function deleteProduto($id) {
         $stmt->bindParam("id", $id);
         $stmt->execute();
         $db = null;
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function getProdutosApp() {
+    $request = \Slim\Slim::getInstance()->request();
+    
+    $get = $request->get();
+
+    try {  
+
+        $sql = "SELECT * FROM tb_produto WHERE ativo = 1";
+
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        $produtos = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        
+        $retorno['produtos'] = $produtos;
+
+        header('Content-Type: text/javascript; charset=utf8');
+
+        $callback = $get['callback'];
+        echo $callback.'('.json_encode($retorno ).');';
+
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
