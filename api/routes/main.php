@@ -15,18 +15,22 @@ function login()
     $request = \Slim\Slim::getInstance()->request();
     $user = json_decode($request->getBody());
 
-    $sql = "SELECT id FROM tb_user WHERE email LIKE :email AND senha LIKE SHA1(:senha)";
+    $sql = "SELECT id, nome, tipo FROM tb_user WHERE email LIKE :email AND senha LIKE SHA1(:senha)";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);
         $stmt->bindParam("email", $user->email);
         $stmt->bindParam("senha", $user->senha);
         $stmt->execute();
+        $user = $stmt->fetchObject();
+        $db = null;
 
-        if($stmt->fetchColumn() > 0){
+        if($user->id > 0){
+            
             //regustrando o login na sessao
             $_SESSION['vrio']['auth'] = true;
-            echo '{"login":{"auth":true}}';
+            echo json_encode($user);
+            //'{"login":{"auth":true}}';
         }else{
             unset($_SESSION['vrio']['auth']);
             echo '{"login":{"auth":false}}';
@@ -44,10 +48,10 @@ function getConnection()
     $serverList = array('localhost', '127.0.0.1');
 
     if(!in_array($_SERVER['HTTP_HOST'], $serverList)) {
-        $dbhost="localhost";
-        $dbuser="gestor_apps";
-        $dbpass="apps1202";
-        $dbname="gestor_apps";
+        $dbhost="mysql.banheirosvrio.com.br";
+        $dbuser="banheirosvrio";
+        $dbpass="vrio3002";
+        $dbname="banheirosvrio";
     }else{
         $dbhost="localhost";
         $dbuser="root";

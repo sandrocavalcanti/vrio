@@ -1,0 +1,90 @@
+<?php 
+  $front = Zend_Controller_Front::getInstance()->getRequest(); 
+  $controller = $front->getControllerName();
+  $action = $front->getActionName();
+?>
+
+<header id="topo" class="box clearfix"><!--INICIO TOPO-->
+
+	<div class="col12 clearfix">
+		<h1 id="logo" class="col4 esq"><!--inicio logo-->
+			<a href="<?php print $this->baseUrl()?>/index/" title="logotipo">
+				<img src="<?php print $this->baseUrl() ?>/public/imgs/logotipo.png" alt="logotipo" /> 
+			</a>
+		</h1><!--fim logo-->
+
+
+		<div class="col7 esq1 dir">
+
+			<div class="col12 esq dir login">
+				<a class="col3 esq btn" href="<?php print $this->baseUrl() ?>/index/cadastro">cadastre-se</a>
+				<form id="form_login" action="" method="post" class="col9 dir">
+					<?php if(!isset($_SESSION['Default']['usuarioLogado'])){ ?>
+					<div class="col5">
+						<input type="text" name="celular" id="celular" value="" placeholder="celular">
+					</div>
+					<div class="col5">
+						<input type="password" name="senha" id="senha" value="" placeholder="senha">
+					</div>
+					<?php }else{ ?>
+						<a class="col6 dir btn" href="<?php print $this->baseUrl() ?>/interna">meus créditos</a>
+					<?php } ?>
+					<div class="col2 dir">
+						<?php if(!isset($_SESSION['Default']['usuarioLogado'])){ ?>
+						<input type="submit" class="btn" name="entrar" value="entrar">
+						<?php }else{ ?>
+						<input type="button" class="btn" id="btn_logout" name="sair" value="sair" style="background-color:red;">
+						<?php } ?>
+					</div>
+				</form>
+			</div>
+
+			<nav class="col12 esq dir clearfix menu"><!--inicio menu-->
+				<ul>
+				   <li><a href="<?php print $this->baseUrl() ?>/index/" class="<?php print ($action == 'index' ? 'ativo' : '' ); ?> current">Home</a></li>
+				   <li><a href="<?php print $this->baseUrl() ?>/index/quem-somos" class="<?php print ($action == 'quem-somos' ? 'ativo' : '' ); ?>">Quem Somos</a></li>
+				   <li><a href="<?php print $this->baseUrl() ?>/index/banheiros" class="<?php print ($action == 'banheiros' ? 'ativo' : '' ); ?>">Banheiros</a></li>
+				   <li><a href="<?php print $this->baseUrl() ?>/index/localizar-banheiros" class="<?php print ($action == 'localizar-banheiros' ? 'ativo' : '' ); ?>">Localizar Banheiros</a></li>
+				   <li><a href="<?php print $this->baseUrl() ?>/index/contato" class="<?php print ($action == 'contato' ? 'ativo' : '' ); ?>">Contato</a></li>
+				</ul>
+			</nav><!--fim menu-->
+
+		</div>
+
+	</div>
+
+	<script>
+		$(document).ready(function() {
+			$('#celular').mask('(99)9999.9999');
+
+			$('#form_login').submit(function(event) {
+				if($('#form_login #celular').val() == '' || $('#form_login #senha').val() == ''){
+					alert("Aviso\n\n* Preencha corretamente o celular e senha.");
+					return false;
+				}
+				$.ajax({
+					url: configGlobal+'auth/login',
+					type: 'post',
+					dataType: 'json',
+					data: $('#form_login').serialize(),
+					success: function (data) {
+						if(data != 0){
+							window.location = configGlobal+'interna/index';
+							return false;
+						}else{
+							alert("Aviso:\n\n* Dados não encontrados. Tente novamente.");
+							return false;
+						}
+					}
+				});
+				return false;
+			});
+
+			$('#btn_logout').click(function(event) {
+				window.location = configGlobal+'auth/logout';
+			});
+		});
+	</script>
+
+</header><!--FIM TOPO-->
+                            

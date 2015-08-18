@@ -143,13 +143,13 @@ padding: 5px 15px;
   </div>
 
   <ul id="menu" class="nav nav-pills hide">
-    <li ng-class="{'active': 1 == menu_ativo}"><a href="#" ng-click="viewCustomer()">Clientes</a></li>
-    <li ng-class="{'active': 2 == menu_ativo}"><a href="#" ng-click="viewBanheiro()">Locais</a></li>
-    <li ng-class="{'active': 3 == menu_ativo}"><a href="#" ng-click="viewProduto()">Produtos</a></li>
-    <li ng-class="{'active': 4 == menu_ativo}"><a href="#" ng-click="viewVenda()">Vendas</a></li>
-    <li ng-class="{'active': 5 == menu_ativo}"><a href="#" ng-click="viewResgate()">Resgate</a></li>
+    <li ng-class="{'active': 1 == menu_ativo}" ng-show="permissao_cliente"><a href="#" ng-click="viewCustomer()">Clientes</a></li>
+    <li ng-class="{'active': 2 == menu_ativo}" ng-show="permissao_locais"><a href="#" ng-click="viewBanheiro()">Locais</a></li>
+    <li ng-class="{'active': 3 == menu_ativo}" ng-show="permissao_produtos"><a href="#" ng-click="viewProduto()">Produtos</a></li>
+    <li ng-class="{'active': 4 == menu_ativo}" ng-show="permissao_vendas"><a href="#" ng-click="viewVenda()">Vendas/Resgate</a></li>
+    <!-- <li ng-class="{'active': 5 == menu_ativo}"><a href="#" ng-click="viewResgate()">Resgate</a></li> -->
     <!-- <li ng-class="{'active': 6 == menu_ativo}"><a href="#" ng-click="viewPonto()">Pontos de Resgate</a></li> -->
-    <li ng-class="{'active': 9 == menu_ativo}"><a href="#" ng-click="viewUser()">Usuários</a></li>
+    <li ng-class="{'active': 9 == menu_ativo}" ng-show="permissao_usuarios"><a href="#" ng-click="viewUser()">Usuários</a></li>
     <li><a href="#" ng-click="logout()">Sair</a></li>
   </ul>
 
@@ -198,7 +198,7 @@ padding: 5px 15px;
                       <tbody>
                         <tr ng-repeat="cust in customers | filter:buscar" ng-click="visualizarCustomer($index,cust)" ng-class="{'active': $index == ativo_customer}">
                           <td>{{cust.data_cadastro}}</td>
-                          <td>{{cust.nome}}</td>
+                          <td>{{cust.nome}} {{cust.sobrenome}}</td>
                           <td>{{cust.email}}</td>
                           <td>{{cust.celular}}</td>
                         </tr>
@@ -516,13 +516,11 @@ padding: 5px 15px;
                         <div class="">
                                 <div class="input-group">
 
-                                  <input type="text" class="form-control" ng-model="buscar.nome">
+                                  <input type="text" class="form-control" ng-model="buscar.cliente">
 
                                   <span class="input-group-btn">
                                     <button class="btn btn-default" type="button">
-                                      
                                       <span class="glyphicon glyphicon-search"></span>
-
                                     </button>
                                   </span>
                                 </div>
@@ -533,15 +531,15 @@ padding: 5px 15px;
                       <th>Id</th>
                       <th>Data de Venda</th>
                       <th>Cliente</th>
-                      <th>Forma Pgto</th>
                       <th>Valor</th>
+                      <th>Status</th>
                       <tbody>
                         <tr ng-repeat="vend in vendas | filter:buscar" ng-click="visualizarVenda($index,vend)" ng-class="{'active': $index == ativo_venda}">
                           <td>{{vend.id}}</td>
                           <td>{{vend.data_cadastro}}</td>
                           <td>{{vend.cliente}}</td>
-                          <td>{{vend.forma_ogto}}</td>
-                          <td>{{vend.valor_total}}</td>
+                          <td align="right">{{vend.valor_total}}</td>
+                          <td>{{formatarStatus(vend.negociacao_status)}}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -551,13 +549,26 @@ padding: 5px 15px;
 
             <div class="tab-content col-sm-5 tab-conteudo">
               <h4 id="nome">{{venda_view.id}} / {{venda_view.cliente}}</h4>
+              <button ng-click="resgatar(venda_view.id)" class="btn btn-success">Resgatar</button>
               <hr>
               <label><strong>Data:</strong> <label id="email">{{venda_view.data_cadastro}}</label></label>
-              <label><strong>Forma Pgto:</strong> <label id="celular">{{venda_view.forma_pgto}}</label></label>
-              <label><strong>Negociação ID:</strong> <label id="sexo">{{venda_view.negociacao_id}}</label></label>
               <label><strong>Valor:</strong> <label id="ativo">{{venda_view.valor_total}}</label></label>
               <hr>
               <h4>Produtos</h4>
+              <table class="table">
+                <th>Descrição</th>
+                <th>Qtde</th>
+                <th>Valor</th>
+                <th>Resgatado em</th>
+                <tbody>
+                  <tr ng-repeat="vendprod in vendaprodutos">
+                    <td>{{vendprod.produto}}</td>
+                    <td align="right">{{vendprod.qtde}}</td>
+                    <td align="right">{{vendprod.valor}}</td>
+                    <td>{{vendprod.data_resgate == null && 'NÃO' || vendprod.data_resgate}}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
   </div> 
@@ -723,7 +734,8 @@ Modal Cadastro Ponto
                 {{user_view.nome}}
               </h4>
               <hr>
-              <label><strong>E-mail:</strong><label>{{user_view.email}}</label></label
+              <label><strong>E-mail:</strong><label>{{user_view.email}}</label></label>
+              <label><strong>Tipo:</strong> <label id="ativo">{{user_view.tipo == 1 && 'Administrador' || 'Operador'}}</label></label>
               <label><strong>Ativo:</strong> <label id="ativo">{{user_view.ativo == 1 && 'SIM' || 'NÃO'}}</label></label>
               <label><strong>Data Cadastro:</strong> <label>{{user_view.data_cadastro}}</label></label>
 
@@ -757,6 +769,13 @@ Modal Cadastro Ponto
           </div>
           <div class="form-group">
             <input type="password" class="form-control"  placeholder="Senha"  ng-model="user_view.senha">
+          </div>
+          <div class="form-group">
+            <label>Tipo:</label>
+            <select class="form-control" ng-model="user_view.tipo">
+              <option value="1">Administrador</option>
+              <option value="2">Operador</option>
+            </select>
           </div>
           <div class="form-group">
             <label>Ativo:</label>

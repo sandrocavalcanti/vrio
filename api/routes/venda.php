@@ -5,6 +5,8 @@ require_once "lib/PagSeguroLibrary/PagSeguroLibrary.php";
 $app->post('/venda', $authenticate($app),'addVenda');
 $app->get('/venda', $authenticate($app), 'getVendas');
 $app->get('/venda/:id',  $authenticate($app), 'getVenda');
+$app->get('/vendaprodutos/:id',  $authenticate($app), 'getProdutosVenda');
+$app->put('/vendaresgate/:id',  $authenticate($app), 'resgatarVenda');
 $app->get('/venda/search/:query', $authenticate($app), 'findVendaByName');
 $app->put('/venda/:id', $authenticate($app), 'updateVenda');
 $app->delete('/venda/:id', $authenticate($app), 'deleteVenda');
@@ -35,7 +37,9 @@ function addVenda()
 
 function getVendas() 
 {
-    $sql = "SELECT * FROM tb_venda";
+    $sql = "SELECT v.*, DATE_FORMAT(v.data_cadastro, '%d/%m/%Y') AS data_cadastro, 
+            CONCAT(c.nome,' ',c.sobrenome) AS cliente 
+            FROM tb_venda v INNER JOIN tb_customer c ON c.id = v.id_customer";
     try {
 
         $db = getConnection();
@@ -60,6 +64,29 @@ function getVenda($id)
         $venda = $stmt->fetchObject();
         $db = null;
         echo json_encode($venda);
+    } catch(PDOException $e) {
+        echo '{"error":{"text":'. $e->getMessage() .'}}';
+    }
+}
+
+function getProdutosVenda($id) {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+
+    $sql = "SELECT p.descricao AS produto, DATE_FORMAT(vp.data_resgate,'%d/%m/%Y') AS data_resgate, 
+            REPLACE(REPLACE(REPLACE(FORMAT((vp.valor_unit * vp.qtde), 2), '.', '@'), ',', '.'), '@', ',') AS valor, 
+            FORMAT(vp.qtde, 0) AS qtde
+            FROM tb_venda_produto vp INNER JOIN tb_produto p ON p.id = vp.id_produto
+            WHERE vp.id_venda=:id";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("id", $id);
+        $stmt->execute();
+        $produtos = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+
+        echo json_encode($produtos);
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
     }
@@ -128,7 +155,7 @@ function getVendasAtivas() {
                 REPLACE(REPLACE(REPLACE(FORMAT(v.valor_total, 2), '.', '@'), ',', '.'), '@', ',') AS valor, 
                 FORMAT(vp.qtde, 0) AS qtde
                 FROM tb_venda_produto vp INNER JOIN tb_venda v ON v.id = vp.id_venda
-                WHERE vp.resgatado = 0 AND v.id_customer=:id
+                WHERE v.negociacao_status IN (3,4) AND vp.resgatado = 0 AND v.id_customer=:id
                 ORDER BY v.data_cadastro ASC";
 
         $db = getConnection();
@@ -155,117 +182,57 @@ function addAppVenda()
     $request = \Slim\Slim::getInstance()->request();
     $post = $request->post();
 
-    // Instantiate a new payment request
-    $paymentRequest = new PagSeguroPaymentRequest();
+    header("Access-Control-Allow-Origin: *");
+    header('Access-Control-Allow-Headers: X-Requested-With');   
 
-    // Sets the currency
-    $paymentRequest->setCurrency("BRL");
+    $retorno = 0;
+    echo json_encode($retorno); exit;
 
-    // Add an item for this payment request
-    $paymentRequest->addItem('0001', 'Notebook prata', 2, 430.00);
-
-    // Add another item for this payment request
-    $paymentRequest->addItem('0002', 'Notebook rosa', 2, 560.00);
-
-    // Sets a reference code for this payment request, it is useful to identify this payment
-    // in future notifications.
-    $paymentRequest->setReference("REF123");
-
-    // Sets shipping information for this payment request
-    $sedexCode = PagSeguroShippingType::getCodeByType('SEDEX');
-    $paymentRequest->setShippingType($sedexCode);
-    $paymentRequest->setShippingAddress(
-        '01452002',
-        'Av. Brig. Faria Lima',
-        '1384',
-        'apto. 114',
-        'Jardim Paulistano',
-        'São Paulo',
-        'SP',
-        'BRA'
-    );
-
-    // Sets your customer information.
-    $paymentRequest->setSender(
-        'João Comprador',
-        'comprador@s2it.com.br',
-        '11',
-        '56273440',
-        'CPF',
-        '156.009.442-76'
-    );
-
-    // Sets the url used by PagSeguro for redirect user after ends checkout process
-    $paymentRequest->setRedirectUrl("http://www.banheirosvrio.com.br/compra/sucesso.php");
-
-    // Add checkout metadata information
-    $paymentRequest->addMetadata('PASSENGER_CPF', '15600944276', 1);
-    $paymentRequest->addMetadata('GAME_NAME', 'DOTA');
-    $paymentRequest->addMetadata('PASSENGER_PASSPORT', '23456', 1);
-
-    // Another way to set checkout parameters
-    $paymentRequest->addParameter('notificationURL', 'http://www.banheirosvrio.com.br/compra/notificacoes.php');
-    $paymentRequest->addParameter('senderBornDate', '07/05/1981');
-    $paymentRequest->addIndexedParameter('itemId', '0003', 3);
-    $paymentRequest->addIndexedParameter('itemDescription', 'Notebook Preto', 3);
-    $paymentRequest->addIndexedParameter('itemQuantity', '1', 3);
-    $paymentRequest->addIndexedParameter('itemAmount', '200.00', 3);
-
-    try {
-
-        /*
-         * #### Credentials #####
-         * Substitute the parameters below with your credentials (e-mail and token)
-         * You can also get your credentials from a config file. See an example:
-         * $credentials = PagSeguroConfig::getAccountCredentials();
-         */
-        $credentials = new PagSeguroAccountCredentials("sandro@unitybrasil.com.br",
-            "657F4FAD9A1543F38DB9B7900539A9E6");
-        $credentials = PagSeguroConfig::getAccountCredentials();
-        // Register this payment request in PagSeguro, to obtain the payment URL for redirect your customer.
-        $url = $paymentRequest->register($credentials);
-
-        //self::printPaymentUrl($url);
-        $retorno = $url;
-    } catch (PagSeguroServiceException $e) {
-        die($e->getMessage());
+    $array_post['id_customer'] = $post['id_customer'];
+    foreach($post as $key=>$value){
+        if(strpos($key, 'prod_') !== false){
+            $array_post['produto_id'][] = str_replace('prod_', '', $key);
+            $array_post['qtde'][] = $value;
+        }
     }
 
-    /*if(!existeCustomer($post)){
-        $sql = "INSERT INTO tb_customer (id, nome, sobrenome, email, sexo, celular, cpf, senha, data_cadastro) 
-                VALUES (NULL, :nome, :sobrenome, :email, :sexo, :celular, :cpf, :senha, NOW())";
-        try {
-            $senha = sha1($post['senha']);
+    $fields_string = http_build_query($array_post);
 
-            $db = getConnection();
-            $stmt = $db->prepare($sql);
-            $stmt->bindParam("nome", $post['nome']);
-            $stmt->bindParam("sobrenome", $post['sobrenome']);
-            $stmt->bindParam("email", $post['email']);
-            $stmt->bindParam("senha", $senha);
-            $stmt->bindParam("sexo", $post['sexo']);
-            $stmt->bindParam("cpf", $post['cpf']);
-            $stmt->bindParam("celular", $post['celular']);
-            
-            $stmt->execute();
-            $id = $db->lastInsertId();
-            $db = null;
-            
-            $retorno = $id;
+    //open connection
+    $ch = curl_init();
 
-        } catch(PDOException $e) {
-            $retorno = 0;
-        }
+    //set the url, number of POST vars, POST data
+    $url = 'http://www.banheirosvrio.com.br/site/public/compra/index.php';
+    curl_setopt($ch,CURLOPT_URL, $url);
+    curl_setopt($ch,CURLOPT_HEADER, 0);
+    curl_setopt($ch,CURLOPT_POST, count($array_post));
+    curl_setopt($ch,CURLOPT_POSTFIELDS, $fields_string);
 
-    }else{
-        $retorno = 0;
-    }*/
+    //execute post
+    $retorno = curl_exec($ch);
 
-    header("Access-Control-Allow-Origin: *");
-    header('Access-Control-Allow-Headers: X-Requested-With');
-    
-    //print_r($post);
+    //close connection
+    curl_close($ch);
+
+    //$retorno = 0;
     echo json_encode($retorno);
+}
 
+function resgatarVenda($id) {
+    $request = \Slim\Slim::getInstance()->request();
+    $body = $request->getBody();
+    
+    $sql = "UPDATE tb_venda_produto SET data_resgate=NOW(), resgatado=1 WHERE id_venda=:id";
+    try {
+        $db = getConnection();
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam("id", $id);
+        $stmt->execute();
+        $db = null;
+        echo json_encode(true);
+    } catch(PDOException $e) {
+        //echo '{"error":{"text":'. $e->getMessage() .'}}';
+        echo json_encode(false);
+    }
 }
 ?>

@@ -1,5 +1,4 @@
 <?php
-
 define("STR_REDUCE_LEFT", 1);
 define("STR_REDUCE_RIGHT", 2);
 define("STR_REDUCE_CENTER", 4);

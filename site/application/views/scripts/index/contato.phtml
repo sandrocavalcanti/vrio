@@ -1,0 +1,43 @@
+
+<section class="box"><!--inicio contato-->
+
+<div class="col12">
+	<h2 class="tit">Contato</h2>
+
+<article  class="col6 esq">
+<?php if(isset($this->msgenviado)){print $this->msgenviado;} ?>
+<form id="form" action="" method="post"><!--inicio formulario-->
+<div>  
+<label for="nome">Nome</label>  
+<input type="text" id="nome" name="nome" required />  
+</div> 
+<div>  
+<label for="fone">Fone</label>  
+<input type="text" id="fone" name="fone" required />  
+</div> 
+<div>  
+<label for="email">Email</label>  
+<input type="email" id="email" name="email" required />  
+</div> 
+<div>
+<label for="msg">Mensagem</label>  
+<textarea id="msg" name="msg" rows="7" required></textarea>
+</div>
+<div id="sub">
+<input type="submit" name="enviar" value="enviar" class="btn" id="enviar">
+</div>
+</form><!--fim formulario-->
+</article>
+
+<article id="mapa" class="col6 dir">
+	<h3>Localização</h3>
+<div class="media">
+	<iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?f=q&amp;source=s_q&amp;hl=pt-BR&amp;geocode=&amp;q=Rua+Monteiro+Lobato,+66,+Santa+Tereza,+Olinda-PE&amp;aq=&amp;sll=37.0625,-95.677068&amp;sspn=51.708931,73.037109&amp;ie=UTF8&amp;hq=&amp;hnear=Rua+Monteiro+Lobato,+66+-+Santa+Tereza,+Pernambuco,+Brasil&amp;t=m&amp;z=14&amp;ll=-8.024552,-34.859755&amp;output=embed"></iframe><br /><small><a href="https://maps.google.com/maps?f=q&amp;source=embed&amp;hl=pt-BR&amp;geocode=&amp;q=Rua+Monteiro+Lobato,+66,+Santa+Tereza,+Olinda-PE&amp;aq=&amp;sll=37.0625,-95.677068&amp;sspn=51.708931,73.037109&amp;ie=UTF8&amp;hq=&amp;hnear=Rua+Monteiro+Lobato,+66+-+Santa+Tereza,+Pernambuco,+Brasil&amp;t=m&amp;z=14&amp;ll=-8.024552,-34.859755" style="color:#0000FF;text-align:left">Exibir mapa ampliado</a></small>
+	</article>
+</div>
+</div>
+
+
+</section><!--fim contato-->
+
+

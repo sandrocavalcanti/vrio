@@ -41,7 +41,7 @@ function addCustomer()
 
 function getCustomers() 
 {
-    $sql = "SELECT *, DATE_FORMAT(data_cadastro,'%d/%m/%Y %H:%i') AS data_cadastro 
+    $sql = "SELECT *, DATE_FORMAT(data_cadastro,'%d/%m/%Y') AS data_cadastro 
             FROM tb_customer ORDER BY nome ASC";
     try {
 
@@ -139,9 +139,13 @@ function loginAppCustomer() {
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);
+
         $senha = sha1($get['senha']);
+        $caracters = array("(",")",".");
+        $celular = str_replace($caracters, "", $get['celular']);
+
         $stmt->bindParam("senha", $senha);
-        $stmt->bindParam("celular", $get['celular']);
+        $stmt->bindParam("celular", $celular);
         $stmt->execute();
         $customer = $stmt->fetchAll(PDO::FETCH_OBJ);
         $db = null;
@@ -151,11 +155,11 @@ function loginAppCustomer() {
         }else{
             $retorno = 0;
         }
-        
-        header('Content-Type: text/javascript; charset=utf8');
 
         $callback = $get['callback'];
+        header('Content-Type: text/javascript; charset=utf8');
         echo $callback.'('.json_encode($customer).');';
+
 
     } catch(PDOException $e) {
         echo '{"error":{"text":'. $e->getMessage() .'}}';
@@ -209,6 +213,9 @@ function addAppCustomer()
 {
     $request = \Slim\Slim::getInstance()->request();
     $post = $request->post();
+
+    $caracters = array("(",")",".");
+    $post['celular'] = str_replace($caracters, "", $post['celular']);
 
     if(!existeCustomer($post)){
         $sql = "INSERT INTO tb_customer (id, nome, sobrenome, email, sexo, celular, cpf, senha, data_cadastro) 

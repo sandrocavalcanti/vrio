@@ -1,0 +1,59 @@
+<style type="text/css">
+  #map-canvas { height: 400px; }
+</style>
+
+<section class="box"><!--inicio contato-->
+
+<div class="col12">
+	<h2 class="tit">localizar banheiros</h2>
+	
+	<div id="map-canvas"/>
+	<!-- <div class="media">
+		<div id="map-canvas"/>
+		<iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com.br/maps?f=q&amp;source=s_q&amp;hl=pt&amp;geocode=&amp;q=recife&amp;aq=&amp;sll=-19.890967,-43.982324&amp;sspn=0.016465,0.016158&amp;ie=UTF8&amp;hq=&amp;hnear=Recife,+Pernambuco&amp;t=m&amp;z=12&amp;ll=-8.05224,-34.92861&amp;output=embed"></iframe>
+		
+	</div> -->
+
+</div>
+
+</section><!--fim contato-->
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+</script>
+<script>
+	var map;
+	function initialize() {
+		var mapOptions = {
+			zoom: 12,
+			center: new google.maps.LatLng(-8.0433112, -34.9384687)
+		};
+		map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+		var locations = [
+	      <?php foreach ($this->banheiros as $banheiro) { ?>
+	      ['<?php print $banheiro["descricao"]; ?>', <?php print $banheiro["latitude"]; ?>, <?php print $banheiro["longitude"]; ?>, '<?php print $banheiro["logradouro"]; ?>'],
+	      <?php } ?>
+	    ];
+
+		var infowindow = new google.maps.InfoWindow();
+
+	    var marker, i;
+
+	    for (i = 0; i < locations.length; i++) {  
+	      marker = new google.maps.Marker({
+	        position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+	        map: map
+	      });
+
+	      google.maps.event.addListener(marker, 'click', (function(marker, i) {
+	        return function() {
+	          infowindow.setContent('<strong>'+locations[i][0]+'</strong><br>'+locations[i][3]);
+	          infowindow.open(map, marker);
+	        }
+	      })(marker, i));
+    	}
+	}
+
+	google.maps.event.addDomListener(window, 'load', initialize);
+
+</script>

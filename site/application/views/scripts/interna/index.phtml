@@ -1,0 +1,106 @@
+
+<section class="box"><!--inicio contato-->
+
+	<div class="col12" style="height:450px;">
+		<h2 class="tit">Meus Créditos</h2>
+
+		<article  class="col10 esq" style="height: 400px;overflow: scroll;">
+			<table width="100%" style="font-size:14px; width:100%" cellpadding="2" cellspacing="2">
+				<thead>
+					<tr>
+						<th width="20%" style="border-bottom:solid 1px; padding:5px">Data</th>
+						<th width="35%" style="border-bottom:solid 1px; padding:5px">Produto</th>
+						<th width="5%" style="border-bottom:solid 1px; padding:5px">Qtde</th>
+						<th width="10%" style="border-bottom:solid 1px; padding:5px">Valor</th>
+						<th width="20%" style="border-bottom:solid 1px; padding:5px">Situação</th>
+					</tr>
+				</thead>
+				<tfoot id="lista_vendas">
+					<?php print $this->lista_vendas; ?>
+				</tfoot>
+			</table>
+		</article>
+
+
+		<article id="mapa" class="col2 dir">
+			<a class="col12 esq btn" id="comprar_creditos" href="#">Comprar Créditos</a>
+			<br> <br>
+			<h1 style="margin-top:40px;">Atenção</h1>
+			<br>
+			<p>A retirada iniciará no dia 27/2 ao dia 03/03.
+				Os horários de retirada das pulseiras serão de 13 às 22hs nas unidades Bugaloo. 
+				O da unidade Boa Vista só abrirá nos dias 1 e 2 de março. 
+				A Miss Lilly's permitirá a retirada do dia 27 de fevereiro a 1 de março. </p>
+		</article>
+
+	</div>
+
+</section><!--fim contato-->
+
+<div id="modal_comprar_credito">
+	<p>Informe abaixo a quantidade dos produtos que deseja comprar, e após, clique em Comprar Créditos. 
+		Será aberta uma janela e você será redirecionado para o PagSeguro. Verifique se a popup foi bloqueada.</p>
+	<form id="form_produtos">
+		<input type="hidden" name="id_customer" value="<?php print $this->id_customer; ?>">
+		<table width="100%" style="font-size:14px; width:100%; display:inline-table;" cellpadding="2" cellspacing="2">
+			<thead>
+				<tr>
+					<th width="60%" style="border-bottom:solid 1px; padding:5px">Produto</th>
+					<th width="20%" style="border-bottom:solid 1px; padding:5px">Valor Unitário</th>
+					<th width="20%" style="border-bottom:solid 1px; padding:5px">Qtde</th>
+				</tr>
+			</thead>
+			<tfoot id="lista_produtos">
+				<?php print $this->lista_produtos; ?>
+			</tfoot>
+		</table>
+	</form>
+</div>
+
+<script>
+$(document).ready(function() {
+	$("#celular").mask('(99)9999.9999');
+	$("#cpf").mask('99999999999');
+
+	$( "#comprar_creditos" ).click(function(e) {
+		e.preventDefault();
+		//alert("Aviso:\n\n* A compra de créditos iniciará no dia 21/02/2014.");
+		$( "#modal_comprar_credito" ).dialog( "open" );
+	});
+
+	$( "#modal_comprar_credito" ).dialog({
+		title: 'Compra de Créditos',
+    	height: 550,
+      	width: 600,
+    	modal: true,
+    	autoOpen: false,
+    	buttons: {
+	        "Comprar créditos": function() {
+	        	$.ajax({
+					url: configGlobal+'public/compra/index.php',
+					type: 'post',
+					dataType:'json',
+					data: $('#form_produtos').serialize(),
+					success: function (data) {
+						if(data != '0'){
+							window.open(data);	
+						}else{
+							alert("Aviso:\n\nAs vendas serão liberadas em breve. Obrigado.");
+						}
+						
+					},
+					error: function() {
+						alert("Aviso:\n\nOcorreu um erro com sua requisição. Tente novamente.");
+					}
+				});
+	        },
+	        Cancel: function() {
+	        	$( this ).dialog( "close" );
+	        }
+		},
+		close: function() {
+
+		}
+    });
+});
+</script>

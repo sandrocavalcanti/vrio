@@ -9,13 +9,26 @@ function AdminCtrl($scope, $http, $window){
 	$scope.login = function(){
 
 		$http.post('../api/login', $scope.user).success(function(data){
-			if(data.login.auth){
+			if(data.id > 0){
 
+				if(data.tipo == 2){
+					$scope.permissao_cliente = false;
+					$scope.permissao_locais = false;
+					$scope.permissao_produtos = false;
+					$scope.permissao_vendas = true;
+					$scope.permissao_usuarios = false;
+					
+					
+				}else{
+					$scope.ativo_venda = 1;
+				}
+
+				$scope.ativo_venda = 1;
 				$('#login').fadeOut(function(){
-					$('#menu').removeClass('hide').fadeIn();
-					//carregando os dados
-					listarCustomer();
-				});
+						$('#menu').removeClass('hide').fadeIn();
+						//carregando os dados
+						listarVenda();
+					});
 
 			}else{
 				$(".alert").addClass('alert-warning');
@@ -107,6 +120,13 @@ function AdminCtrl($scope, $http, $window){
 		});
 	}
 
+	var listarVendaProduto = function (id_venda) {
+		$http.get('../api/vendaprodutos/'+id_venda).success(function(data){
+			//console.log(data.error);
+			$scope.vendaprodutos = data;
+		});
+	}
+
 	/*var listarPonto = function () {
 		$http.get('../api/ponto').success(function(data){
 			//console.log(data.error);
@@ -145,6 +165,7 @@ function AdminCtrl($scope, $http, $window){
 	$scope.visualizarVenda = function($index, venda){
 		$scope.venda_view = venda;
 		$scope.ativo_venda = $index;
+		listarVendaProduto(venda.id);
 	}
 
 	/*$scope.visualizarPonto = function($index, ponto){
@@ -235,6 +256,32 @@ function AdminCtrl($scope, $http, $window){
 		$scope.produto_view = {id:0, descricao:'', valor:0, ativo:0};
 		$('#modalCadastro').modal('hide');
 		$(".alert").css({display: ''}).fadeOut(5000);
+	}
+
+	$scope.resgatar = function(id_venda){
+
+		if(confirm('Deseja realmente resgatar este Crédito?') && id_venda > 0){
+
+			$http.put('../api/vendaresgate/'+id_venda).success(function(data){
+				if(data == 'true'){
+					$(".alert").css({display: 'block'});
+					$(".alert").addClass('alert-warning');
+					$("#msg_alert").html('Venda resgatada com sucesso!');
+
+					listarVenda();
+				}else{
+					alert('Aviso: Resgate não realizado. Tente novamente.');
+				}
+			
+			});
+
+		}else{
+
+			if(id_venda <= 0){
+				alert('Aviso: Selecione uma vendas antes de resgatá-la.');
+			}
+
+		}
 	}
 
 	/*$scope.salvarPonto = function(){
@@ -367,13 +414,51 @@ function AdminCtrl($scope, $http, $window){
 		
 	}
 
+	$scope.formatarStatus = function(status){
+		var retorno = '';
+		switch(parseInt(status))
+		{
+		case 1:
+            retorno = 'Aguardando Pagamento';
+            break;
+        case 2:
+            retorno = 'Em Análise';
+            break;
+        case 3:
+            retorno = 'Paga';
+            break;
+        case 4:
+            retorno = 'Disponível';
+            break;
+        case 5:
+            retorno = 'Em Disputa';
+            break;
+        case 6:
+            retorno = 'Devolvida';
+            break;
+        case 7:
+            retorno = 'Cancelada';
+            break;
+		default:
+		  retorno = 'Aguardando Pagamento';
+		}
+
+		return retorno;
+	}
+
 	var init = function(){
+
+		$scope.permissao_cliente = true;
+		$scope.permissao_locais = true;
+		$scope.permissao_produtos = true;
+		$scope.permissao_vendas = true;
+		$scope.permissao_usuarios = true;
 
 		$scope.menu_ativo = 1;
 
 		$scope.ativo_user = 0;
-		$scope.user_view = {id:0, nome:'', email:'', senha:''};
-		$scope.user = {id:0, nome:'', email:'', senha:''};
+		$scope.user_view = {id:0, nome:'', email:'', senha:'', tipo:1, ativo:0};
+		$scope.user = {id:0, nome:'', email:'', senha:'', tipo:1, ativo:0};
 		$scope.users = [];
 
 		$scope.ativo_banheiro = 0;
@@ -392,9 +477,11 @@ function AdminCtrl($scope, $http, $window){
 		$scope.produtos = [];
 
 		$scope.ativo_venda = 0;
-		$scope.venda_view = {id:0, valor_total:0, data_cadastro:'', cliente:'', id_customer:0, negociacao_id:0, forma_pgto:''};
-		$scope.venda = {id:0, valor_total:0, data_cadastro:'', cliente:'', id_customer:0, negociacao_id:0, forma_pgto:''};
+		$scope.venda_view = {id:0, valor_total:0, data_cadastro:'', cliente:'', id_customer:0, negociacao_status:1};
+		$scope.venda = {id:0, valor_total:0, data_cadastro:'', cliente:'', id_customer:0, negociacao_status:1};
 		$scope.vendas = [];
+
+		$scope.vendaprodutos = [];
 
 		/*$scope.ativo_ponto = 0;
 		$scope.ponto_view = {id:0, descricao:'', logradouto:'', numero:'', bairro:'', cep:'', cidade:'', uf:'', latitude:'', longitude:'', ativo:0};
@@ -403,7 +490,7 @@ function AdminCtrl($scope, $http, $window){
 
 		//checando login
 		$http.get('../api/checkauth').success(function(data){
-			if(data.auth != false){
+			if(data.id > 0){
 				//carregando os dados
 				listarCustomer();
 

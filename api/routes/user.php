@@ -12,8 +12,8 @@ function addUser()
     $request = \Slim\Slim::getInstance()->request();
     $user = json_decode($request->getBody());
 
-    $sql = "INSERT INTO tb_user (nome, email, senha, data_cadastro) 
-            VALUES (:nome, :email, :senha, NOW())";
+    $sql = "INSERT INTO tb_user (nome, email, senha, tipo, ativo, data_cadastro) 
+            VALUES (:nome, :email, :senha, :tipo, :ativo, NOW())";
     try {
         //cripted
         $pass = sha1($user->senha);
@@ -22,6 +22,8 @@ function addUser()
         $stmt = $db->prepare($sql);
         $stmt->bindParam("nome", $user->nome);
         $stmt->bindParam("email", $user->email);
+        $stmt->bindParam("tipo", $user->tipo);
+        $stmt->bindParam("ativo", $user->ativo);
         $stmt->bindParam("senha", $pass);
         
         $stmt->execute();
@@ -89,13 +91,15 @@ function updateUser($id) {
     $request = \Slim\Slim::getInstance()->request();
     $body = $request->getBody();
     $user = json_decode($body);
-    $sql = "UPDATE tb_user SET nome=:nome, email=:email, senha=:senha WHERE id=:id";
+    $sql = "UPDATE tb_user SET nome=:nome, email=:email, senha=:senha, tipo=:tipo, ativo=:ativo WHERE id=:id";
     try {
         $db = getConnection();
         $stmt = $db->prepare($sql);
         $stmt->bindParam("nome", $user->nome);
         $stmt->bindParam("email", $user->email);
         $stmt->bindParam("senha", $user->senha);
+        $stmt->bindParam("tipo", $user->tipo);
+        $stmt->bindParam("ativo", $user->ativo);
         
         $stmt->bindParam("id", $id);
         $stmt->execute();

@@ -1,0 +1,116 @@
+
+<section class="box"><!--inicio contato-->
+
+<div class="col12">
+	<h2 class="tit">Cadastre-se</h2>
+
+<article  class="col6 esq">
+<?php if(isset($this->msgenviado)){print $this->msgenviado;} ?>
+<form id="form"  action="" method="post"><!--inicio formulario-->
+<div>  
+<label for="nome">Nome</label>  
+<input type="text" id="nome" name="nome" required />  
+</div> 
+<div>  
+<label for="nome">Sobrenome</label>  
+<input type="text" id="sobrenome" name="sobrenome" required />  
+</div> 
+<div>  
+<label for="fone">Celular</label>  
+<input type="text" id="celular" name="celular" required />  
+</div> 
+<div>  
+<label for="fone">CPF</label>  
+<input type="text" id="cpf" name="cpf" required />  
+</div> 
+<div>  
+<label for="fone">Sexo</label>  
+<select id="sexo" name="sexo">
+	<option value="M">Masculino</option>
+	<option value="F">Feminino</option>
+</select>
+</div> 
+<div>  
+<label for="email">Email</label>  
+<input type="email" id="email" name="email" required />  
+</div> 
+<div>
+<label for="msg">Senha</label>  
+<input type="password" id="senha" name="senha" required />  
+</div>
+<div>
+<label for="msg">Confirme a Senha</label>  
+<input type="password" id="senha_confirme" name="senha_confirme" required />  
+</div>
+<div>
+<label for="msg">
+	<input type="checkbox" id="aceito" style="float: left;width: 20px;height: auto;"> <p style="font-size:14px; width:300px;">Li e aceito o <a style="font-size:14px;" href="http://www.banheirosvrio.com.br/site/public/termo/termo_adesao_vrio.htm" target="_blank">Termo de Adesão</a>.</p>
+</label>  
+</div>
+<div id="sub">
+<input type="submit" name="enviar" value="enviar" class="btn" id="enviar">
+</div>
+</form><!--fim formulario-->
+</article>
+
+<article id="mapa" class="col6 dir">
+	<h3>INFORMAÇÕES</h3>
+	<p>Preencha todos os campos do formulário para ter acesso aos serviços oferecidos pelo Banheiros Vrio.</p>
+</article>
+
+</div>
+
+</section><!--fim contato-->
+
+<script>
+$(document).ready(function() {
+	$("#form #celular").mask('(99)9999.9999');
+	$("#cpf").mask('99999999999');
+
+	$('#form').submit(function(event) {
+
+		// get all the inputs into an array.
+	    var $inputs = $('#form :input');
+
+	    $inputs.each(function() {
+	        if($(this).val() == ''){
+	        	alert('Aviso: Preencha todos os campos do Formulário.');
+	        	return false;
+	        }
+	    });
+
+	    var senha = $('#form #senha').val();
+	    if(senha.length < 4){
+	        alert('Aviso: A senha deve possuir mais de 3 caracteres.');
+	        return false;
+	    }
+
+	    if($('#form #senha').val() != $('#form #senha_confirme').val()){
+	        alert('Aviso: A confirmação da senha está incorreta.');
+	        return false;
+	    }
+
+	    var termo = $('#form #aceito').attr('checked');
+	    if(!termo){
+	    	alert('Aviso: Você precisa aceitar os termos de uso para realizar o cadastro.');
+	        return false;
+	    }
+
+		// $.ajax({
+		// 	url: configGlobal+'index/cadastro',
+		// 	type: 'post',
+		// 	data: $('#form').serialize(),
+		// 	success: function (data) {
+		// 		if(data != "0"){
+		// 			alert("Cadastro realizado com sucesso.\nFaça o login com seus dados de acesso.");
+		// 			window.location = 'http://www.banheirosvrio.com.br/';
+		// 		}else{
+		// 			alert("Aviso:\n\n* Já existe um cadastro com esse celular e/ou CPF. Tente novamente com outro.");
+		// 		}
+		// 	}
+		// });
+
+		//return false;
+	});
+});
+</script>
